@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "../components/navbar";
 
 export default function Contacto() {
   const [formData, setFormData] = useState({
@@ -37,16 +36,19 @@ export default function Contacto() {
       } else {
         setError("Hubo un problema al enviar el correo.");
       }
-    } catch (err) {
-      setError("Error de conexión. Inténtalo de nuevo.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Error de conexión. Inténtalo de nuevo.");
+      } else {
+        setError("Error de conexión. Inténtalo de nuevo.");
+      }
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="bg-black text-white min-h-screen p-8 sm:p-20">
-      <Navbar />
+    <>
       <div className="mt-8 flex flex-col items-start gap-4">
         <p className="text-2xl">
           Teléfono: <span className="font-bold">+34 649 805 899</span>
@@ -110,6 +112,6 @@ export default function Contacto() {
         {success && <p className="text-green-400 mt-4 text-center"><strong>¡Mensaje enviado con éxito!</strong></p>}
         {error && <p className="text-red-400 mt-4 text-center"><strong>{error}</strong></p>}
       </div>
-    </div>
+    </>
   );
 }

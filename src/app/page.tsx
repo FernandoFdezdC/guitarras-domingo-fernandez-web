@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import Navbar from "./components/navbar";
 
 const slides = [
   { text: "Guitarras artesanales hechas a mano con la mejor madera.", image: "/guitar1.jpg" },
@@ -21,9 +20,7 @@ export default function Home() {
   }, []);
   
   return (
-    <div className="bg-black text-white min-h-screen p-8 sm:p-20">
-      <Navbar />
-
+    <>
       {/* Carousel: full width on mobile, side-by-side on larger screens */}
       <div className="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
         {/* Slide Text */}
@@ -49,6 +46,6 @@ export default function Home() {
           Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
         </p>
       </div>
-    </div>
+    </>
   );
 }
