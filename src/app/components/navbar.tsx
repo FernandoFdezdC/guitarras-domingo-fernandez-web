@@ -1,13 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { FaGlobe } from "react-icons/fa";
 
 export default function Navbar() {
-  const pathname = usePathname();
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [currentLang, setCurrentLang] = useState<"es" | "en">("es");
+  const [langPopupOpen, setLangPopupOpen] = useState(false);
+  const initialized = useRef(false); // Control de inicialización
+
+  const langPopupStyle = "absolute top-full mt-2 right-0 bg-[#660000] rounded-lg shadow-lg z-50";
+  const langOptionStyle = "px-4 py-2 hover:bg-[#aa2929] text-white cursor-pointer transition-colors";
+
+  // Leer cookie SOLO después de la hidratación. Esto se ejecuta en el navegador del cliente.
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const cookie = document.cookie
+      .split("; ")
+      .find(row => row.startsWith("preferred_language="));
+    console.log("WARNING. COOKIES ARE BEING READ ON THE USER'S BROWSER!");
+
+    if (cookie) {
+      const lang = cookie.split("=")[1];
+      if (lang === "es" || lang === "en") {
+        setCurrentLang(lang);
+        document.documentElement.lang = lang;
+      }
+    }
+  }, []);
+
+  // Cambiar idioma con interacción explícita. Esto se ejecuta en el navegador del cliente también
+  const changeLanguage = (lang: "es" | "en") => {
+    document.cookie = `preferred_language=${lang}; path=/; max-age=31536000`; // 1 año
+    document.documentElement.lang = lang;
+    setCurrentLang(lang);
+    console.log("WARNING. COOKIES ARE BEING MODIFIED ON THE USER'S BROWSER!");
+  };
+
+  const langPopupRef = useRef<HTMLDivElement>(null);
+  const langTriggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!langPopupOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const clickedPopup = langPopupRef.current?.contains(target);
+      const clickedTrigger = langTriggerRef.current?.contains(target);
+      
+      if (!clickedPopup && !clickedTrigger) {
+        setLangPopupOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [langPopupOpen]);
+
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsNavigating(false); // Restablecer cuando cambie la ruta
@@ -51,6 +107,33 @@ export default function Navbar() {
           >
             Contacto
           </Link>
+          {/* Botón Idioma Desktop */}
+          <div className="relative">
+            <button
+              ref={langTriggerRef}
+              onClick={() => setLangPopupOpen(!langPopupOpen)}
+              className="transition-colors flex items-center justify-center text-white h-10 w-10 rounded-full bg-[#660000] hover:bg-[#aa2929] cursor-pointer"
+            >
+              <FaGlobe className="text-xl" />
+            </button>
+            
+            {langPopupOpen && (
+              <div ref={langPopupRef} className={langPopupStyle}>
+                <div 
+                  className={`${langOptionStyle} ${currentLang === 'es' ? 'bg-[#aa2929]' : ''}`} 
+                  onClick={() => { changeLanguage("es"); setLangPopupOpen(false); }}
+                >
+                  <span className="text-sm">🇪🇸</span> Español
+                </div>
+                <div 
+                  className={`${langOptionStyle} ${currentLang === 'en' ? 'bg-[#aa2929]' : ''}`} 
+                  onClick={() => { changeLanguage("en"); setLangPopupOpen(false); }}
+                >
+                  <span className="text-sm">🇬🇧</span> English
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         {/* Mobile Hamburger Button */}
         <button
@@ -107,6 +190,26 @@ export default function Navbar() {
           >
             Contacto
           </Link>
+          {/* Botón Idioma Mobile */}
+          <div className="relative border-b-2 border-[#8B0000]">
+            <button
+              onClick={() => setLangPopupOpen(!langPopupOpen)}
+              className="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center"
+            >
+              Idioma
+            </button>
+            
+            {langPopupOpen && (
+              <div className="bg-[#660000]">
+                <div className={langOptionStyle} onClick={() => { changeLanguage("es"); setLangPopupOpen(false); }}>
+                  Español
+                </div>
+                <div className={langOptionStyle} onClick={() => { changeLanguage("en"); setLangPopupOpen(false); }}>
+                  English
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
       {isNavigating && (
