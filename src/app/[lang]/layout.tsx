@@ -13,12 +13,12 @@ export async function generateMetadata({
   // Example: Define metadata for English and Spanish.
   if (lang === "en") {
     return {
-      title: "Guitars - English",
+      title: "Domingo Fernández Guitars - English",
       description: "Welcome to our English page.",
     };
   }
   return {
-    title: "Guitarras - Español",
+    title: "Guitarras Domingo Fernández - Español",
     description: "Bienvenido a nuestra página en español.",
   };
 }

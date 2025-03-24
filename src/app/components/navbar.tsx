@@ -19,6 +19,7 @@ export default function Navbar() {
   const langPopupStyle = "absolute top-full mt-2 right-0 bg-[#660000] rounded-lg shadow-lg z-50";
   const langOptionStyle = "px-4 py-2 hover:bg-[#aa2929] text-white cursor-pointer transition-colors";
 
+  
   // Leer cookie SOLO después de la hidratación. Esto se ejecuta en el navegador del cliente.
   useEffect(() => {
     if (initialized.current) return;
@@ -30,13 +31,27 @@ export default function Navbar() {
     // console.log("WARNING. COOKIES ARE BEING READ ON THE USER'S BROWSER!");
 
     if (cookie) {
-      const lang = cookie.split("=")[1];
-      if (lang === "es" || lang === "en") {
-        setCurrentLang(lang);
-        document.documentElement.lang = lang;
+      const langFromCookie = cookie.split("=")[1];
+      if (langFromCookie === "es" || langFromCookie === "en") {
+        setCurrentLang(langFromCookie);
+        document.documentElement.lang = langFromCookie;
       }
     }
   }, []);
+
+  // Define router
+  const router = useRouter();
+  useEffect(() => {
+    // Obtener el path actual y modificar el segmento del idioma
+    const currentPath = window.location.pathname; // Ej.: "/en/inicio" o "/es/contacto"
+    const pathParts = currentPath.split("/"); // ["", "en", "inicio"]
+    // Suponemos que el idioma es el primer segmento (índice 1)
+    pathParts[1] = currentLang;
+    const newPath = pathParts.join("/") || "/";
+
+    // Redirigir al nuevo path
+    router.push(newPath);
+  }, [currentLang]);
 
   const langTriggerRef = useRef<HTMLButtonElement>(null);
   const langPopupRef = useRef<HTMLDivElement>(null);
@@ -61,7 +76,6 @@ export default function Navbar() {
     };
   }, [langDropdownOpen]);
   
-  const router = useRouter();
   // Cambiar idioma con interacción explícita. Esto se ejecuta en el navegador del cliente también
   const changeLanguage = (lang: "es" | "en") => {
     // console.log("changed language");
@@ -69,16 +83,6 @@ export default function Navbar() {
     document.documentElement.lang = lang;
     setCurrentLang(lang);
     // console.log("WARNING. COOKIES ARE BEING MODIFIED ON THE USER'S BROWSER!");
-
-    // Obtener el path actual y modificar el segmento del idioma
-    const currentPath = window.location.pathname; // Ej.: "/en/inicio" o "/es/contacto"
-    const pathParts = currentPath.split("/"); // ["", "en", "inicio"]
-    // Suponemos que el idioma es el primer segmento (índice 1)
-    pathParts[1] = lang;
-    const newPath = pathParts.join("/") || "/";
-
-    // Redirigir al nuevo path
-    router.push(newPath);
   };
 
   const pathname = usePathname();
