@@ -6,9 +6,14 @@ import Link from "next/link";
 import { FaGlobe } from "react-icons/fa";
 import LanguageMobilePopup from "../components/languageMobilePopup";
 import { useRouter } from "next/navigation";
+import { useParams } from 'next/navigation';
+import { useLocaleDictionary } from '../lib/useLocaleDictionary';
 
 export default function Navbar() {
-  
+  // Recuperamos el lang dinámico
+  const { lang } = useParams() as { lang?: string };
+  const t = useLocaleDictionary(lang || 'es').navbar; // fallback
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [currentLang, setCurrentLang] = useState<"es" | "en">("es");
@@ -95,7 +100,7 @@ export default function Navbar() {
     <>
       {/* Top Navbar */}
       <nav className="w-full flex items-center justify-between py-4 px-4 sm:px-8 bg-[#4d0000] transition-transform duration-300">
-        <span className="text-3xl font-bold">Guitarras Domingo Fernández</span>
+        <span className="text-3xl font-bold">{t.title}</span>
         {/* Desktop Navigation Links (aligned to right) */}
         <div className="hidden sm:flex gap-6">
           <Link
@@ -107,7 +112,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
           >
-            Inicio
+            {t.home}
           </Link>
           <Link
             href={`/${currentLang}/guitarras`}
@@ -118,7 +123,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
           >
-            Guitarras
+            {t.guitars}
           </Link>
           <Link
             href={`/${currentLang}/contacto`}
@@ -129,7 +134,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
           >
-            Contacto
+            {t.contact}
           </Link>
           {/* Botón Idioma Desktop */}
           <div className="relative">
@@ -195,7 +200,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
           >
-            Inicio
+            {t.home}
           </Link>
           <Link
             href={`/${currentLang}/guitarras`}
@@ -209,7 +214,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
           >
-            Guitarras
+            {t.guitars}
           </Link>
           <Link
             href={`/${currentLang}/contacto`}
@@ -223,7 +228,7 @@ export default function Navbar() {
                 : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
           >
-            Contacto
+            {t.contact}
           </Link>
           {/* Botón Idioma Mobile */}
           <div className="relative border-b-2 border-[#8B0000]">
@@ -234,7 +239,7 @@ export default function Navbar() {
               }}
               className="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center"
             >
-              Idioma
+              {t.language}
             </button>
           </div>
         </div>

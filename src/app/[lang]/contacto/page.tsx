@@ -1,8 +1,15 @@
+// app/[lang]/contacto/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useParams } from 'next/navigation';
+import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
+import { useState } from 'react';
 
-export default function Contacto() {
+export default function ContactPage() {
+  // Recuperamos el lang dinámico
+  const { lang } = useParams() as { lang?: string };
+  const t = useLocaleDictionary(lang || 'es').contact; // fallback
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,7 +41,7 @@ export default function Contacto() {
         setSuccess(true);
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setError("Hubo un problema al enviar el correo.");
+        setError(t.contact.errorMsg);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -51,23 +58,23 @@ export default function Contacto() {
     <>
       <div className="mt-8 flex flex-col items-start gap-4">
         <p className="text-2xl">
-          Teléfono: <span className="font-bold">+34 649 805 899</span>
+          {t.contact.phone}: <span className="font-bold">+34 649 805 899</span>
         </p>
         <p className="text-2xl">
-          Dirección: <span className="font-bold">
-            Calle General Moscardó, n.º 16, Navahermosa (Toledo), España
+          {t.contact.address}: <span className="font-bold">
+            {t.contact.addressName}
           </span>
         </p>
       </div>
 
       {/* Contenedor del formulario centrado */}
       <div className="mt-12 mx-auto w-full max-w-xl bg-red-800 p-8 rounded">
-        <h2 className="text-3xl font-bold mb-6 text-center">Envíanos un mensaje</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">{t.contact.title}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="name"
-            placeholder="Tu nombre"
+            placeholder={t.placeholders.name}
             required
             value={formData.name}
             onChange={handleChange}
@@ -77,7 +84,7 @@ export default function Contacto() {
           <input
             type="email"
             name="email"
-            placeholder="Tu correo electrónico"
+            placeholder={t.placeholders.email}
             required
             value={formData.email}
             onChange={handleChange}
@@ -86,7 +93,7 @@ export default function Contacto() {
           <input
             type="text"
             name="subject"
-            placeholder="Asunto"
+            placeholder={t.placeholders.subject}
             required
             value={formData.subject}
             onChange={handleChange}
@@ -94,7 +101,7 @@ export default function Contacto() {
           />
           <textarea
             name="message"
-            placeholder="Tu mensaje"
+            placeholder={t.placeholders.message}
             required
             rows={5}
             value={formData.message}
@@ -106,10 +113,10 @@ export default function Contacto() {
             className="w-full bg-red-600 hover:bg-red-700 cursor-pointer text-white font-bold py-3 px-4 rounded text-lg"
             disabled={loading}
           >
-            {loading ? "Enviando..." : <strong>Enviar mensaje</strong>}
+            {loading ? t.buttons.sending : <strong>{t.buttons.send}</strong>}
           </button>
         </form>
-        {success && <p className="text-green-400 mt-4 text-center"><strong>¡Mensaje enviado con éxito!</strong></p>}
+        {success && <p className="text-green-400 mt-4 text-center"><strong>{t.contact.successMsg}</strong></p>}
         {error && <p className="text-red-400 mt-4 text-center"><strong>{error}</strong></p>}
       </div>
     </>

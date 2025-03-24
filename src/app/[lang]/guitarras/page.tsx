@@ -1,12 +1,25 @@
-import GuitarCard from "../../components/guitarCard"; // Ajusta la ruta según tu estructura
+// app/[lang]/guitarras/page.tsx
+"use client";
+
+import { useParams } from 'next/navigation';
+import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
+import GuitarCard from "../../components/guitarCard";
 
 export default function Guitarras() {
+  // Recuperamos el lang dinámico
+  const { lang } = useParams() as { lang?: string };
+  const t = useLocaleDictionary(lang || 'es').guitars; // fallback
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-      <GuitarCard image="/guitar1.jpg" title="guitarra1" description="Descripción de la guitarra 1" />
-      <GuitarCard image="/guitar2.jpg" title="guitarra2" description="Descripción de la guitarra 2" />
-      <GuitarCard image="/guitar3.jpg" title="guitarra3" description="Descripción de la guitarra 3" />
-      {/* Añade más GuitarCard según lo necesites */}
+      {t.map((guitar, index) => (
+        <GuitarCard
+          key={index}
+          image={`/guitar${index + 1}.jpg`}
+          title={guitar.title}
+          description={guitar.description}
+        />
+      ))}
     </div>
   );
 }
