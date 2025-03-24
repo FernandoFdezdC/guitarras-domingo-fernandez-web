@@ -1,4 +1,4 @@
-import GuitarCard from "../../app/components/guitarCard"; // Ajusta la ruta según tu estructura
+import GuitarCard from "../../components/guitarCard"; // Ajusta la ruta según tu estructura
 
 export default function Guitarras() {
   return (

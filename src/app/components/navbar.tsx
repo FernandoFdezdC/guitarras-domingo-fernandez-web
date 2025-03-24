@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { FaGlobe } from "react-icons/fa";
 import LanguageMobilePopup from "../components/languageMobilePopup";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   
@@ -59,15 +60,25 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [langDropdownOpen]);
-
+  
+  const router = useRouter();
   // Cambiar idioma con interacción explícita. Esto se ejecuta en el navegador del cliente también
-  // Modifica la función para devolver una Promise
   const changeLanguage = (lang: "es" | "en") => {
     // console.log("changed language");
     document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict; Secure`;
     document.documentElement.lang = lang;
     setCurrentLang(lang);
     // console.log("WARNING. COOKIES ARE BEING MODIFIED ON THE USER'S BROWSER!");
+
+    // Obtener el path actual y modificar el segmento del idioma
+    const currentPath = window.location.pathname; // Ej.: "/en/inicio" o "/es/contacto"
+    const pathParts = currentPath.split("/"); // ["", "en", "inicio"]
+    // Suponemos que el idioma es el primer segmento (índice 1)
+    pathParts[1] = lang;
+    const newPath = pathParts.join("/") || "/";
+
+    // Redirigir al nuevo path
+    router.push(newPath);
   };
 
   const pathname = usePathname();
@@ -84,10 +95,10 @@ export default function Navbar() {
         {/* Desktop Navigation Links (aligned to right) */}
         <div className="hidden sm:flex gap-6">
           <Link
-            href="/"
-            onClick={() => { if (pathname !== "/") setIsNavigating(true); }}
+            href={`/${currentLang}`}
+            onClick={() => { if (pathname !== `/${currentLang}`) setIsNavigating(true); }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm sm:text-base h-10 px-4 ${
-              pathname === "/"
+              /^\/[a-zA-Z]{2,3}\/?$/.test(pathname)
                 ? "bg-[#aa2929]"
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
@@ -95,10 +106,10 @@ export default function Navbar() {
             Inicio
           </Link>
           <Link
-            href="/guitarras"
-            onClick={() => { if (pathname !== "/guitarras") setIsNavigating(true); }}
+            href={`/${currentLang}/guitarras`}
+            onClick={() => { if (pathname !== `/${currentLang}/guitarras`) setIsNavigating(true); }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm sm:text-base h-10 px-4 ${
-              pathname === "/guitarras"
+              pathname.endsWith('/guitarras')
                 ? "bg-[#aa2929]"
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
@@ -106,10 +117,10 @@ export default function Navbar() {
             Guitarras
           </Link>
           <Link
-            href="/contacto"
-            onClick={() => { if (pathname !== "/contacto") setIsNavigating(true); }}
+            href={`/${currentLang}/contacto`}
+            onClick={() => { if (pathname !== `/${currentLang}/contacto`) setIsNavigating(true); }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm sm:text-base h-10 px-4 ${
-              pathname === "/contacto"
+              pathname.endsWith('/contacto')
                 ? "bg-[#aa2929]"
                 : "bg-[#660000] hover:bg-[#CC3939]"
             } rounded-full`}
@@ -169,25 +180,27 @@ export default function Navbar() {
       {menuOpen && (
         <div className="sm:hidden w-full flex flex-col">
           <Link
-            href="/"
-            onClick={() => { 
-              if (pathname !== "/") setIsNavigating(true);
+            href={`/${currentLang}`}
+            onClick={() => {
+              if (pathname !== `/${currentLang}`) setIsNavigating(true);
               setMenuOpen(false); // Cerrar menú móvil
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
-              pathname === "/" ? "bg-[#aa2929]" : "bg-[#660000] hover:bg-[#aa2929]"
+              /^\/[a-zA-Z]{2,3}\/?$/.test(pathname)
+                ? "bg-[#aa2929]"
+                : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
           >
             Inicio
           </Link>
           <Link
-            href="/guitarras"
+            href={`/${currentLang}/guitarras`}
             onClick={() => { 
               if (pathname !== "/guitarras") setIsNavigating(true);
               setMenuOpen(false); // Cerrar menú móvil
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
-              pathname === "/guitarras"
+              pathname.endsWith('/guitarras')
                 ? "bg-[#aa2929]"
                 : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
@@ -195,13 +208,13 @@ export default function Navbar() {
             Guitarras
           </Link>
           <Link
-            href="/contacto"
+            href={`/${currentLang}/contacto`}
             onClick={() => { 
-              if (pathname !== "/contacto") setIsNavigating(true);
+              if (pathname !== `/${currentLang}/contacto`) setIsNavigating(true);
               setMenuOpen(false); // Cerrar menú móvil
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
-              pathname === "/contacto"
+              pathname.endsWith('/contacto')
                 ? "bg-[#aa2929]"
                 : "bg-[#660000] hover:bg-[#aa2929]"
             }`}
