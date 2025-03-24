@@ -203,46 +203,11 @@ export default function Navbar() {
       )}
       {/* Popup de Idioma */}
       {langPopupOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => setLangPopupOpen(false)}
-        >
-          {/* Prevent click propagation inside the popup */}
-          <div 
-            className="bg-[#660000] p-6 rounded-lg w-64"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                changeLanguage("es"); // Espera a que termine
-                setLangPopupOpen(false);    // Luego cierra
-              }}
-              className={`w-full text-left py-3 px-4 rounded-md transition-colors ${
-                currentLang === 'es' 
-                  ? 'bg-[#AA2929] hover:bg-[#CC3939]' 
-                  : 'bg-transparent hover:bg-[#8B0000]'
-              } text-white mb-2`}
-            >
-              🇪🇸 Español
-            </button>
-            
-            <button
-              type="button"
-              onClick={() => {
-                changeLanguage("en"); // Espera a que termine
-                setLangPopupOpen(false);    // Luego cierra
-              }}
-              className={`w-full text-left py-3 px-4 rounded-md transition-colors ${
-                currentLang === 'en' 
-                  ? 'bg-[#AA2929] hover:bg-[#CC3939]' 
-                  : 'bg-transparent hover:bg-[#8B0000]'
-              } text-white`}
-            >
-              🇬🇧 English
-            </button>
-          </div>
-        </div>
+        <LanguageMobilePopup
+          currentLanguage={currentLang}
+          setLanguagePopupOpen={setLangPopupOpen}
+          handleLanguageChange={changeLanguage}
+        />
       )}
       {isNavigating && (
         <div className="fixed inset-0 bg-black opacity-70 z-50 flex items-center justify-center">
