@@ -254,7 +254,7 @@ export default function Navbar() {
       )}
       {isNavigating && (
         <div className="fixed inset-0 bg-black opacity-70 z-50 flex items-center justify-center">
-          <span className="text-white text-2xl">Cargando...</span>
+          <span className="text-white text-2xl">{t.loading}</span>
         </div>
       )}
     </>
