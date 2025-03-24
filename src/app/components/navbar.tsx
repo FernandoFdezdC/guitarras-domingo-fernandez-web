@@ -12,6 +12,7 @@ export default function Navbar() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [currentLang, setCurrentLang] = useState<"es" | "en">("es");
   const [langPopupOpen, setLangPopupOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const initialized = useRef(false); // Control de inicialización
 
   const langPopupStyle = "absolute top-full mt-2 right-0 bg-[#660000] rounded-lg shadow-lg z-50";
@@ -99,23 +100,23 @@ export default function Navbar() {
           <div className="relative">
             <button
               ref={langTriggerRef}
-              onClick={() => setLangPopupOpen(!langPopupOpen)}
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
               className="transition-colors flex items-center justify-center text-white h-10 w-10 rounded-full bg-[#660000] hover:bg-[#CC3939] cursor-pointer"
             >
               <FaGlobe className="text-xl" />
             </button>
             
-            {langPopupOpen && (
+            {langDropdownOpen && (
             <div ref={langPopupRef} className={langPopupStyle + " overflow-hidden"}> {/* Asegura que los bordes no se solapen */}
               <div 
                 className={`${langOptionStyle} ${currentLang === 'es' ? 'bg-[#aa2929]' : ''} rounded-t-lg`} // Redondeo arriba
-                onClick={() => { changeLanguage("es"); setLangPopupOpen(false); }}
+                onClick={() => { changeLanguage("es"); setLangDropdownOpen(false); }}
               >
                 <span className="text-sm">🇪🇸</span> Español
               </div>
               <div 
                 className={`${langOptionStyle} ${currentLang === 'en' ? 'bg-[#aa2929]' : ''} rounded-b-lg`} // Redondeo abajo
-                onClick={() => { changeLanguage("en"); setLangPopupOpen(false); }}
+                onClick={() => { changeLanguage("en"); setLangDropdownOpen(false); }}
               >
                 <span className="text-sm">🇬🇧</span> English
               </div>
