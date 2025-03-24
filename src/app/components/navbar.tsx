@@ -37,6 +37,29 @@ export default function Navbar() {
     }
   }, []);
 
+  const langTriggerRef = useRef<HTMLButtonElement>(null);
+  const langPopupRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        langTriggerRef.current && 
+        !langTriggerRef.current.contains(event.target as Node) &&
+        langPopupRef.current && 
+        !langPopupRef.current.contains(event.target as Node)
+      ) {
+        setLangDropdownOpen(false);
+      }
+    };
+  
+    if (langDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [langDropdownOpen]);
+
   // Cambiar idioma con interacción explícita. Esto se ejecuta en el navegador del cliente también
   // Modifica la función para devolver una Promise
   const changeLanguage = (lang: "es" | "en") => {
@@ -46,9 +69,6 @@ export default function Navbar() {
     setCurrentLang(lang);
     // console.log("WARNING. COOKIES ARE BEING MODIFIED ON THE USER'S BROWSER!");
   };
-
-  const langPopupRef = useRef<HTMLDivElement>(null);
-  const langTriggerRef = useRef<HTMLButtonElement>(null);
 
   const pathname = usePathname();
 
@@ -107,21 +127,21 @@ export default function Navbar() {
             </button>
             
             {langDropdownOpen && (
-            <div ref={langPopupRef} className={langPopupStyle + " overflow-hidden"}> {/* Asegura que los bordes no se solapen */}
+            <div ref={langPopupRef} className={langPopupStyle + " overflow-hidden"}>
               <div 
-                className={`${langOptionStyle} ${currentLang === 'es' ? 'bg-[#aa2929]' : ''} rounded-t-lg`} // Redondeo arriba
+                className={`${langOptionStyle} ${currentLang === 'es' ? 'bg-[#aa2929]' : ''} rounded-t-lg`}
                 onClick={() => { changeLanguage("es"); setLangDropdownOpen(false); }}
               >
                 <span className="text-sm">🇪🇸</span> Español
               </div>
               <div 
-                className={`${langOptionStyle} ${currentLang === 'en' ? 'bg-[#aa2929]' : ''} rounded-b-lg`} // Redondeo abajo
+                className={`${langOptionStyle} ${currentLang === 'en' ? 'bg-[#aa2929]' : ''} rounded-b-lg`}
                 onClick={() => { changeLanguage("en"); setLangDropdownOpen(false); }}
               >
                 <span className="text-sm">🇬🇧</span> English
               </div>
             </div>
-          )}
+            )}
           </div>
         </div>
         {/* Mobile Hamburger Button */}
