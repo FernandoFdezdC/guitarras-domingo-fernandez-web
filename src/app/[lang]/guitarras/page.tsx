@@ -2,7 +2,7 @@
 "use client";
 
 import { useParams } from 'next/navigation';
-import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
+import { useLocaleDictionary } from '@/app/lib/useLocaleDictionary';
 import GuitarCard from "../../components/guitarCard";
 
 export default function Guitarras() {
