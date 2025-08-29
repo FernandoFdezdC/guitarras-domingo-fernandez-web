@@ -3,7 +3,7 @@
 
 import { useParams } from 'next/navigation';
 import { useLocaleDictionary } from '@/app/lib/useLocaleDictionary';
-import GuitarCard from "../../components/guitarCard";
+import GuitarCard from "@/app/components/guitarCard";
 
 export default function Guitarras() {
   // Recuperamos el lang dinámico
