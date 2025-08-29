@@ -38,7 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 In order to add relative path functionality, add the following to the `"compiler options"` in the `tsconfig.json` file:
 
-```bash
+```javascript
 "paths": {
   "@/*": ["./src/*"]
 }

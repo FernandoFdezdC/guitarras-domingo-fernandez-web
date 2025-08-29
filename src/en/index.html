@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitars - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/globals.css">
+</head>
+<body class="text-white min-h-screen p-8 sm:p-20">
+    <!-- The navbar will be automatically inserted here -->
+    
+    <!-- Main Content -->
+    <div class="container mx-auto">
+        <!-- Carousel -->
+        <div class="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
+            <!-- Slide Text -->
+            <p id="carousel-text" class="text-lg sm:max-w-sm">Discover the excellence in sound of our handcrafted guitars.</p>
+            
+            <!-- Slide Image -->
+            <img id="carousel-image" src="../images/guitar1.jpg" alt="Guitar" class="rounded-lg mt-4 sm:mt-0 w-[300px] h-[200px] object-cover">
+        </div>
+
+        <!-- About Us Section -->
+        <div class="w-full flex flex-col px-4 sm:px-8 mt-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center">About Us</h2>
+            <p class="mt-6 text-lg text-justify w-full">
+                We are passionate about crafting high-quality guitars. With years of experience 
+                and dedication, we create instruments that not only sound exceptionally well 
+                but are also works of art in themselves.
+            </p>
+            <p class="mt-6 text-lg text-justify w-full">
+                Every guitar we build is unique and designed to meet the specific needs 
+                of musicians who seek excellence in every note. Our process combines 
+                traditional techniques with modern innovation.
+            </p>
+        </div>
+    </div>
+
+    <!-- Script to load the navbar -->
+    <script src="../js/load-navbar.js"></script>
+
+    <script>
+        // Texts for the carousel in English
+        const slides = [
+            { text: "Discover the excellence in sound of our handcrafted guitars.", image: "../images/guitar1.jpg" },
+            { text: "Each instrument is created with carefully selected woods and attention to detail.", image: "../images/guitar2.jpg" },
+            { text: "Experience the superior quality that sets us apart in every chord.", image: "../images/guitar3.jpg" }
+        ];
+
+        let currentSlide = 0;
+        const textElement = document.getElementById('carousel-text');
+        const imageElement = document.getElementById('carousel-image');
+
+        function showSlide(index) {
+            textElement.textContent = slides[index].text;
+            imageElement.src = slides[index].image;
+            imageElement.alt = "Guitar " + (index + 1);
+        }
+
+        // Show the first slide
+        showSlide(currentSlide);
+
+        // Change slide every 5 seconds
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000);
+    </script>
+</body>
+</html>

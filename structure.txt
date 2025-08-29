@@ -1,0 +1,22 @@
+mi-sitio-web-bucket (nombre del bucket)
+├── index.html
+├── es/
+│   ├── index.html
+│   ├── guitarras.html
+│   └── contacto.html
+├── en/
+│   ├── index.html
+│   ├── guitars.html
+│   └── contact.html
+├── css/
+│   ├── globals.css
+│   └── components.css
+├── js/
+│   ├── app.js
+│   ├── contact-form.js
+│   └── language-switcher.js
+├── locales/
+│   ├── en.json
+│   └── es.json
+├── images/
+└── favicon.ico

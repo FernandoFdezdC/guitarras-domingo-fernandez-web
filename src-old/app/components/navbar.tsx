@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { FaGlobe } from "react-icons/fa";
-import LanguageMobilePopup from "../components/languageMobilePopup";
+import LanguageMobilePopup from "./languageMobilePopup";
 import { useRouter } from "next/navigation";
 import { useParams } from 'next/navigation';
 import { useLocaleDictionary } from '../lib/useLocaleDictionary';

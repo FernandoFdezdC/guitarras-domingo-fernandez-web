@@ -1,0 +1,304 @@
+<link rel="stylesheet" href="../css/navbar.css">
+
+<nav class="w-full flex items-center justify-between py-4 px-4 sm:px-8 navbar-bg">
+    <!-- Título a la izquierda -->
+    <span id="nav-title" class="text-3xl font-bold text-white">Guitarras Domingo Fernández</span>
+    
+    <!-- Contenedor para elementos de la derecha -->
+    <div class="flex items-center gap-6">
+        <!-- Enlaces de navegación (visible en desktop) -->
+        <div class="hidden sm:flex gap-6">
+            <a id="nav-home" href="#" class="nav-button inactive">Inicio</a>
+            <a id="nav-guitars" href="#" class="nav-button inactive">Guitarras</a>
+            <a id="nav-contact" href="#" class="nav-button inactive">Contacto</a>
+        </div>
+        
+        <!-- Selector de idioma desktop -->
+        <div class="hidden sm:block relative">
+            <button id="lang-trigger" class="transition-colors flex items-center justify-center text-white h-10 w-10 rounded-full bg-[#660000] hover:bg-[#CC3939] cursor-pointer">
+                <i class="fas fa-globe text-xl"></i>
+            </button>
+            
+            <div id="lang-dropdown" class="lang-popup hidden">
+                <div id="lang-option-es" class="lang-option rounded-t-lg">🇪🇸 Español</div>
+                <div id="lang-option-en" class="lang-option rounded-b-lg">🇬🇧 English</div>
+            </div>
+        </div>
+        
+        <!-- Botón de menú hamburguesa (solo móvil) -->
+        <button id="mobile-menu-button" class="sm:hidden text-white focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Menú móvil -->
+<div id="mobile-menu" class="sm:hidden w-full flex flex-col hidden">
+    <a id="mobile-nav-home" href="#" class="mobile-nav-item inactive">Inicio</a>
+    <a id="mobile-nav-guitars" href="#" class="mobile-nav-item inactive">Guitarras</a>
+    <a id="mobile-nav-contact" href="#" class="mobile-nav-item inactive">Contacto</a>
+    
+    <!-- Botón de idioma móvil -->
+    <div class="relative border-b-2 border-[#8B0000]">
+        <button id="mobile-lang-button" class="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center">
+            Idioma
+        </button>
+    </div>
+</div>
+
+<!-- Popup de idioma móvil -->
+<div id="mobile-lang-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="absolute bottom-0 left-0 right-0 bg-[#660000] rounded-t-2xl p-4">
+        <h3 class="text-white text-lg font-bold mb-4">Seleccionar idioma</h3>
+        <div class="flex flex-col gap-2">
+            <button id="mobile-lang-option-es" class="px-4 py-2 bg-[#aa2929] text-white rounded-lg">Español</button>
+            <button id="mobile-lang-option-en" class="px-4 py-2 bg-[#660000] hover:bg-[#aa2929] text-white rounded-lg">English</button>
+        </div>
+        <button id="close-lang-popup" class="mt-4 w-full px-4 py-2 bg-[#8B0000] text-white rounded-lg">Cerrar</button>
+    </div>
+</div>
+
+<!-- Overlay de carga -->
+<div id="loading-overlay" class="loading-overlay hidden">
+    <span class="text-white text-2xl">Cargando...</span>
+</div>
+
+<script>
+    // Configuración de textos según idioma
+    const translations = {
+        es: {
+            title: "Guitarras Domingo Fernández",
+            home: "Inicio",
+            guitars: "Guitarras",
+            contact: "Contacto",
+            language: "Idioma",
+            loading: "Cargando..."
+        },
+        en: {
+            title: "Guitars Domingo Fernández",
+            home: "Home",
+            guitars: "Guitars",
+            contact: "Contact",
+            language: "Language",
+            loading: "Loading..."
+        }
+    };
+
+    // Estado de la navbar
+    let currentLang = 'es';
+    let menuOpen = false;
+    let langDropdownOpen = false;
+
+    // Inicialización
+    function initNavbar() {
+        // Establecer idioma desde cookie o por defecto
+        const cookieLang = getCookie('preferred_language');
+        if (cookieLang && (cookieLang === 'es' || cookieLang === 'en')) {
+            currentLang = cookieLang;
+        }
+        document.documentElement.lang = currentLang;
+        
+        // Actualizar textos
+        updateTexts();
+        
+        // Configurar enlaces
+        setupLinks();
+        
+        // Configurar eventos
+        setupEvents();
+        
+        // Actualizar enlace activo
+        updateActiveLink();
+    }
+
+    // Obtener cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Actualizar textos según idioma
+    function updateTexts() {
+        const t = translations[currentLang];
+        document.getElementById('nav-title').textContent = t.title;
+        document.getElementById('nav-home').textContent = t.home;
+        document.getElementById('nav-guitars').textContent = t.guitars;
+        document.getElementById('nav-contact').textContent = t.contact;
+        document.getElementById('mobile-nav-home').textContent = t.home;
+        document.getElementById('mobile-nav-guitars').textContent = t.guitars;
+        document.getElementById('mobile-nav-contact').textContent = t.contact;
+        document.getElementById('mobile-lang-button').textContent = t.language;
+        document.querySelector('#loading-overlay span').textContent = t.loading;
+    }
+
+    // Configurar enlaces
+    function setupLinks() {
+        const basePath = `/${currentLang}`;
+        document.getElementById('nav-home').href = `${basePath}/`;
+        document.getElementById('nav-guitars').href = `${basePath}/guitarras.html`;
+        document.getElementById('nav-contact').href = `${basePath}/contacto.html`;
+        document.getElementById('mobile-nav-home').href = `${basePath}/`;
+        document.getElementById('mobile-nav-guitars').href = `${basePath}/guitarras.html`;
+        document.getElementById('mobile-nav-contact').href = `${basePath}/contacto.html`;
+    }
+
+    // Configurar eventos
+    function setupEvents() {
+        // Menú móvil
+        document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
+        
+        // Dropdown de idioma desktop
+        document.getElementById('lang-trigger').addEventListener('click', toggleLangDropdown);
+        
+        // Opciones de idioma desktop
+        document.getElementById('lang-option-es').addEventListener('click', () => changeLanguage('es'));
+        document.getElementById('lang-option-en').addEventListener('click', () => changeLanguage('en'));
+        
+        // Popup de idioma móvil
+        document.getElementById('mobile-lang-button').addEventListener('click', openMobileLangPopup);
+        document.getElementById('mobile-lang-option-es').addEventListener('click', () => {
+            changeLanguage('es');
+            closeMobileLangPopup();
+        });
+        document.getElementById('mobile-lang-option-en').addEventListener('click', () => {
+            changeLanguage('en');
+            closeMobileLangPopup();
+        });
+        document.getElementById('close-lang-popup').addEventListener('click', closeMobileLangPopup);
+        
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            const langTrigger = document.getElementById('lang-trigger');
+            const langDropdown = document.getElementById('lang-dropdown');
+            
+            if (langDropdownOpen && langTrigger && !langTrigger.contains(e.target) && 
+                langDropdown && !langDropdown.contains(e.target)) {
+                langDropdown.classList.add('hidden');
+                langDropdownOpen = false;
+            }
+        });
+        
+        // Navegación
+        const navLinks = [
+            document.getElementById('nav-home'),
+            document.getElementById('nav-guitars'),
+            document.getElementById('nav-contact'),
+            document.getElementById('mobile-nav-home'),
+            document.getElementById('mobile-nav-guitars'),
+            document.getElementById('mobile-nav-contact')
+        ];
+        
+        navLinks.forEach(link => {
+            if (link) {
+                link.addEventListener('click', (e) => {
+                    if (link.href !== window.location.href) {
+                        document.getElementById('loading-overlay').classList.remove('hidden');
+                    }
+                });
+            }
+        });
+    }
+
+    // Actualizar enlace activo
+    function updateActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = {
+            home: [
+                document.getElementById('nav-home'),
+                document.getElementById('mobile-nav-home')
+            ],
+            guitars: [
+                document.getElementById('nav-guitars'),
+                document.getElementById('mobile-nav-guitars')
+            ],
+            contact: [
+                document.getElementById('nav-contact'),
+                document.getElementById('mobile-nav-contact')
+            ]
+        };
+        
+        // Reset all links
+        Object.values(links).forEach(linkGroup => {
+            linkGroup.forEach(link => {
+                if (link) {
+                    link.classList.remove('active');
+                    link.classList.add('inactive');
+                }
+            });
+        });
+        
+        // Set active link
+        if (currentPath.endsWith('/') || currentPath.endsWith('/index.html')) {
+            links.home.forEach(link => {
+                if (link) {
+                    link.classList.remove('inactive');
+                    link.classList.add('active');
+                }
+            });
+        } else if (currentPath.includes('guitarras')) {
+            links.guitars.forEach(link => {
+                if (link) {
+                    link.classList.remove('inactive');
+                    link.classList.add('active');
+                }
+            });
+        } else if (currentPath.includes('contacto')) {
+            links.contact.forEach(link => {
+                if (link) {
+                    link.classList.remove('inactive');
+                    link.classList.add('active');
+                }
+            });
+        }
+    }
+
+    // Alternar menú móvil
+    function toggleMobileMenu() {
+        menuOpen = !menuOpen;
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    // Alternar dropdown de idioma
+    function toggleLangDropdown(e) {
+        e.stopPropagation();
+        langDropdownOpen = !langDropdownOpen;
+        document.getElementById('lang-dropdown').classList.toggle('hidden');
+    }
+
+    // Abrir popup de idioma móvil
+    function openMobileLangPopup() {
+        document.getElementById('mobile-menu').classList.add('hidden');
+        document.getElementById('mobile-lang-popup').classList.remove('hidden');
+    }
+
+    // Cerrar popup de idioma móvil
+    function closeMobileLangPopup() {
+        document.getElementById('mobile-lang-popup').classList.add('hidden');
+    }
+
+    // Cambiar idioma
+    function changeLanguage(lang) {
+        if (lang === currentLang) return;
+        
+        // Guardar preferencia
+        document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict`;
+        document.documentElement.lang = lang;
+        currentLang = lang;
+        
+        // Redirigir a la misma página en el nuevo idioma
+        const currentPath = window.location.pathname;
+        const newPath = currentPath.replace(/^\/(es|en)/, `/${lang}`);
+        document.getElementById('loading-overlay').classList.remove('hidden');
+        window.location.href = newPath;
+    }
+
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNavbar);
+    } else {
+        initNavbar();
+    }
+</script>

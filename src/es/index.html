@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitarras - Inicio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/globals.css">
+</head>
+<body class="text-white min-h-screen p-8 sm:p-20">
+    <!-- La navbar se insertará aquí automáticamente -->
+    
+    <!-- Contenido principal -->
+    <div class="container mx-auto">
+        <!-- Carrusel -->
+        <div class="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
+            <!-- Slide Text -->
+            <p id="carousel-text" class="text-lg sm:max-w-sm">Descubre la excelencia en el sonido de nuestras guitarras artesanales.</p>
+            
+            <!-- Slide Image -->
+            <img id="carousel-image" src="../images/guitar1.jpg" alt="Guitarra" class="rounded-lg mt-4 sm:mt-0 w-[300px] h-[200px] object-cover">
+        </div>
+
+        <!-- About Us Section -->
+        <div class="w-full flex flex-col px-4 sm:px-8 mt-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center">Sobre Nosotros</h2>
+            <p class="mt-6 text-lg text-justify w-full">
+                Somos apasionados por la fabricación de guitarras de alta calidad. Con años de experiencia 
+                y dedicación, creamos instrumentos que no solo suenan excepcionalmente bien, sino que 
+                también son una obra de arte en sí mismos.
+            </p>
+            <p class="mt-6 text-lg text-justify w-full">
+                Cada guitarra que fabricamos es única y está diseñada para satisfacer las necesidades 
+                específicas de músicos que buscan excelencia en cada nota. Nuestro proceso combina 
+                técnicas tradicionales con innovación moderna.
+            </p>
+        </div>
+    </div>
+
+    <!-- Script para cargar la navbar -->
+    <script src="../js/load-navbar.js"></script>
+
+    <script>
+        // Textos para el carrusel en español
+        const slides = [
+            { text: "Descubre la excelencia en el sonido de nuestras guitarras artesanales.", image: "../images/guitar1.jpg" },
+            { text: "Cada instrumento es creado con maderas seleccionadas y atención al detalle.", image: "../images/guitar2.jpg" },
+            { text: "Experimenta la calidad superior que nos distingue en cada acorde.", image: "../images/guitar3.jpg" }
+        ];
+
+        let currentSlide = 0;
+        const textElement = document.getElementById('carousel-text');
+        const imageElement = document.getElementById('carousel-image');
+
+        function showSlide(index) {
+            textElement.textContent = slides[index].text;
+            imageElement.src = slides[index].image;
+            imageElement.alt = "Guitarra " + (index + 1);
+        }
+
+        // Mostrar el primer slide
+        showSlide(currentSlide);
+
+        // Cambiar slide cada 5 segundos
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000);
+    </script>
+</body>
+</html>
