@@ -14,4 +14,4 @@ Create a CloudFront distribution and assing an URL with Alias type (A type + Ali
 
 In order to create the lambda function, we must upload a .zip file into AWS with the following content: `index.mjs` (which can be found in `/lambda/index.mjs`), `package.json`, `package-lock.json` and `node_modules` installed. Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
 
-Lastly, create a type HTTP API Gateway
+Lastly, create a type HTTP API Gateway with a POST endpoint /contact that consumes the email information and passes it onto the Lambda function. It is important to take into account that the Lambda service is, by default, asynchronous (i.e., while the message is being sent we can execute other tasks).
