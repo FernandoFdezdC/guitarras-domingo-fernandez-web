@@ -64,3 +64,301 @@
 <div id="loading-overlay" class="loading-overlay hidden">
     <span class="text-white text-2xl">Cargando...</span>
 </div>
+
+<script>
+/* ---------- Helpers y lógica de la navbar (inyectados aquí) ---------- */
+function defineNavbarLogic() {
+  // Si ya definimos la lógica antes, no redefinir
+  if (window._navbarLogicDefined) return;
+  window._navbarLogicDefined = true;
+
+  /* ---------- cookies helpers ---------- */
+  function getCookie(name) {
+    const v = `; ${document.cookie}`;
+    const parts = v.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return undefined;
+  }
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days || 365) * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Lax`;
+  }
+
+  /* ---------- traducciones simples ---------- */
+  const translations = {
+    es: {
+      title: "Guitarras Domingo Fernández",
+      home: "Inicio",
+      guitars: "Guitarras",
+      contact: "Contacto",
+      language: "Idioma",
+      loading: "Cargando..."
+    },
+    en: {
+      title: "Guitars Domingo Fernández",
+      home: "Home",
+      guitars: "Guitars",
+      contact: "Contact",
+      language: "Language",
+      loading: "Loading..."
+    }
+  };
+
+  /* ---------- Estado ---------- */
+  let currentLang = 'es';
+  let menuOpen = false;
+  let langDropdownOpen = false;
+
+  /* ---------- util rutas (preserva la ruta tras cambiar idioma) ---------- */
+  function buildPathWithLang(lang) {
+    // Reemplaza/Inserta el primer segmento de la ruta con lang.
+    const pathname = window.location.pathname;
+    const parts = pathname.split('/'); // ['', 'es', 'guitarras', ...] o ['', '']
+    if (!parts[1] || (parts[1] !== 'es' && parts[1] !== 'en')) {
+      // no hay segmento de idioma -> insertar
+      const newPath = (`/${lang}${pathname}`).replace(/\/+/g, '/');
+      return newPath.endsWith('/') ? newPath : newPath + '/';
+    } else if (parts[1] !== lang) {
+      parts[1] = lang;
+      let p = parts.join('/');
+      p = p.replace(/\/+/g, '/');
+      // Normalizar: si termina en /index.html quítalo
+      if (p.endsWith('/index.html')) p = p.replace(/\/index\.html$/, '/');
+      return p.endsWith('/') ? p : p + '/';
+    } else {
+      // ya está en el mismo idioma; normalizar trailing slash
+      return pathname.endsWith('/') ? pathname : pathname.replace(/\/index\.html$/, '/');
+    }
+  }
+
+  /* ---------- actualizar textos y links ---------- */
+  function updateTexts() {
+    const t = translations[currentLang] || translations.es;
+    const elTitle = document.getElementById('nav-title');
+    if (elTitle) elTitle.textContent = t.title;
+    const mapText = [
+      ['nav-home', t.home],
+      ['nav-guitars', t.guitars],
+      ['nav-contact', t.contact],
+      ['mobile-nav-home', t.home],
+      ['mobile-nav-guitars', t.guitars],
+      ['mobile-nav-contact', t.contact],
+    ];
+    mapText.forEach(([id, txt]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    });
+    const mobileLangBtn = document.getElementById('mobile-lang-button');
+    if (mobileLangBtn) mobileLangBtn.textContent = t.language;
+    const overlaySpan = document.querySelector('#loading-overlay span');
+    if (overlaySpan) overlaySpan.textContent = t.loading;
+  }
+
+  function setupLinks() {
+    const basePath = `/${currentLang}`;
+    // rutas con trailing slash
+    const homeHref = `${basePath}/`;
+    const guitarsHref = `${basePath}/guitarras/`;
+    const contactHref = `${basePath}/contacto/`;
+    const map = [
+      ['nav-home', homeHref],
+      ['nav-guitars', guitarsHref],
+      ['nav-contact', contactHref],
+      ['mobile-nav-home', homeHref],
+      ['mobile-nav-guitars', guitarsHref],
+      ['mobile-nav-contact', contactHref],
+    ];
+    map.forEach(([id, href]) => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('href', href);
+    });
+  }
+
+  /* ---------- overlay loading: compara pathname (no href absoluto) ---------- */
+  function setupNavLinkLoading() {
+    const navIds = ['nav-home', 'nav-guitars', 'nav-contact', 'mobile-nav-home', 'mobile-nav-guitars', 'mobile-nav-contact'];
+    navIds.forEach(id => {
+      const link = document.getElementById(id);
+      if (!link) return;
+      link.addEventListener('click', (e) => {
+        // obtener pathname del enlace
+        const targetPath = new URL(link.href, window.location.origin).pathname.replace(/\/index\.html$/, '/');
+        const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
+        if (targetPath !== currentPath) {
+          const overlay = document.getElementById('loading-overlay');
+          if (overlay) overlay.classList.remove('hidden');
+        }
+        // no preventDefault: dejamos que navegue a la URL real
+      });
+    });
+  }
+
+  /* ---------- active link ---------- */
+  function updateActiveLink() {
+    const pathname = window.location.pathname.replace(/\/index\.html$/, '/');
+    const base = `/${currentLang}`;
+    const links = {
+      home: ['nav-home', 'mobile-nav-home'],
+      guitars: ['nav-guitars', 'mobile-nav-guitars'],
+      contact: ['nav-contact', 'mobile-nav-contact']
+    };
+
+    // reset
+    Object.values(links).flat().forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('active');
+        el.classList.add('inactive');
+      }
+    });
+
+    if (pathname === `${base}/` || pathname === `${base}`) {
+      links.home.forEach(id => { const el=document.getElementById(id); if(el){el.classList.remove('inactive'); el.classList.add('active')}} );
+    } else if (pathname.includes(`${base}/guitarras`)) {
+      links.guitars.forEach(id => { const el=document.getElementById(id); if(el){el.classList.remove('inactive'); el.classList.add('active')}} );
+    } else if (pathname.includes(`${base}/contacto`)) {
+      links.contact.forEach(id => { const el=document.getElementById(id); if(el){el.classList.remove('inactive'); el.classList.add('active')}} );
+    }
+  }
+
+  /* ---------- toggles UI ---------- */
+  function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (!mobileMenu) return;
+    menuOpen = !menuOpen;
+    mobileMenu.classList.toggle('hidden');
+  }
+  function toggleLangDropdown(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    langDropdownOpen = !langDropdownOpen;
+    const dd = document.getElementById('lang-dropdown');
+    if (!dd) return;
+    if (langDropdownOpen) {
+      dd.classList.remove('hidden');
+      const firstOpt = dd.querySelector('.lang-option');
+      if (firstOpt && firstOpt.focus) firstOpt.focus();
+      setTimeout(() => { document.addEventListener('click', docCloseHandler); }, 0);
+    } else {
+      dd.classList.add('hidden');
+      document.removeEventListener('click', docCloseHandler);
+    }
+  }
+  function openMobileLangPopup() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) mobileMenu.classList.add('hidden');
+    const popup = document.getElementById('mobile-lang-popup');
+    if (popup) popup.classList.remove('hidden');
+  }
+  function closeMobileLangPopup() {
+    const popup = document.getElementById('mobile-lang-popup');
+    if (popup) popup.classList.add('hidden');
+  }
+
+  /* ---------- cambio de idioma (preserva la ruta) ---------- */
+  function changeLanguage(lang) {
+    if (lang !== 'es' && lang !== 'en') return;
+    setCookie('preferred_language', lang, 365);
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    updateTexts();
+    setupLinks();
+    updateActiveLink();
+    // Redirigir a la misma ruta con el primer segmento cambiado/insertado
+    const newPath = buildPathWithLang(lang);
+    if (newPath !== window.location.pathname) {
+      // usaremos replace para no llenar el history innecesariamente
+      window.location.replace(newPath);
+    }
+  }
+
+  /* ---------- initNavbar (NO redirige automáticamente) ---------- */
+  function initNavbarInner() {
+    // cookie
+    const cookieLang = getCookie('preferred_language');
+    if (cookieLang === 'es' || cookieLang === 'en') currentLang = cookieLang;
+    document.documentElement.lang = currentLang;
+
+    updateTexts();
+    setupLinks();
+    setupNavLinkLoading();
+    updateActiveLink();
+
+    // eventos UI
+    const mobileBtn = document.getElementById('mobile-menu-button');
+    if (mobileBtn) mobileBtn.addEventListener('click', toggleMobileMenu);
+
+    const langTrigger = document.getElementById('lang-trigger');
+    if (langTrigger) {
+      langTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleLangDropdown(e);
+      });
+    }
+
+    const ddEs = document.getElementById('lang-option-es');
+    const ddEn = document.getElementById('lang-option-en');
+    if (ddEs) ddEs.addEventListener('click', () => changeLanguage('es'));
+    if (ddEn) ddEn.addEventListener('click', () => changeLanguage('en'));
+
+    const mobileLangBtn = document.getElementById('mobile-lang-button');
+    if (mobileLangBtn) mobileLangBtn.addEventListener('click', openMobileLangPopup);
+    const mobileLangEs = document.getElementById('mobile-lang-option-es');
+    const mobileLangEn = document.getElementById('mobile-lang-option-en');
+    if (mobileLangEs) mobileLangEs.addEventListener('click', () => { changeLanguage('es'); closeMobileLangPopup(); });
+    if (mobileLangEn) mobileLangEn.addEventListener('click', () => { changeLanguage('en'); closeMobileLangPopup(); });
+    const closeLangBtn = document.getElementById('close-lang-popup');
+    if (closeLangBtn) closeLangBtn.addEventListener('click', closeMobileLangPopup);
+
+    // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
+  }
+
+  // Exponer initNavbar globalmente para compatibilidad
+  window.initNavbar = initNavbarInner;
+
+  // Función de cierre del dropdown cuando se hace click fuera
+  function docCloseHandler(e) {
+    const langTrigger = document.getElementById('lang-trigger');
+    const langDropdown = document.getElementById('lang-dropdown');
+    if (!langDropdown) return;
+    if (langDropdown.classList.contains('hidden')) return;
+    const target = e.target;
+    if ((langTrigger && langTrigger.contains(target)) || langDropdown.contains(target)) {
+      return;
+    }
+    langDropdown.classList.add('hidden');
+    langDropdownOpen = false;
+    document.removeEventListener('click', docCloseHandler);
+  }
+
+  // Función manual de inicialización en caso de que initNavbar no exista (fallback)
+  window.initializeNavbarManually = function initializeNavbarManually() {
+    console.log('[navbar] inicializando manualmente (fallback)...');
+    // Botón de menú móvil
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    }
+    // Selector de idioma básico
+    const langTrigger = document.getElementById('lang-trigger');
+    const langDropdown = document.getElementById('lang-dropdown');
+    if (langTrigger && langDropdown) {
+      langTrigger.addEventListener('click', (e) => { e.stopPropagation(); langDropdown.classList.toggle('hidden'); });
+      document.addEventListener('click', () => langDropdown.classList.add('hidden'));
+    }
+  };
+}
+defineNavbarLogic();
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initNavbar === 'function') {
+        initNavbar();
+    } else {
+        console.warn('initNavbar no está definida. Inicializando manualmente.');
+        if (typeof initializeNavbarManually === 'function') {
+            initializeNavbarManually();
+        }
+    }
+});
+</script>
