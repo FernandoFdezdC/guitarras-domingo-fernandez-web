@@ -273,17 +273,31 @@ function defineNavbarLogic() {
   /* ---------- cambio de idioma (preserva la ruta) ---------- */
   function changeLanguage(lang) {
     if (lang !== 'es' && lang !== 'en') return;
+
+    // Mostrar overlay con texto del idioma actual (antes de cambiar currentLang)
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        const overlaySpan = overlay.querySelector('span');
+        if (overlaySpan) {
+            // Usamos currentLang actual
+            const t = translations[currentLang] || translations.es;
+            overlaySpan.textContent = t.loading;
+        }
+        overlay.classList.remove('hidden');
+        overlay.style.display = 'flex';
+    }
+
+    // Actualizamos cookie y currentLang
     setCookie('preferred_language', lang, 365);
     currentLang = lang;
     document.documentElement.lang = lang;
-    updateTexts();
     setupLinks();
     updateActiveLink();
-    // Redirigir a la misma ruta con el primer segmento cambiado/insertado
+
+    // Redirigimos (updateTexts no afecta al overlay porque ya se muestra)
     const newPath = buildPathWithLang(lang);
     if (newPath !== window.location.pathname) {
-      // usaremos replace para no llenar el history innecesariamente
-      window.location.replace(newPath);
+        window.location.replace(newPath);
     }
   }
 
