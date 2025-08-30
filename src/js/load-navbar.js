@@ -33,16 +33,11 @@ async function loadNavbar() {
             }
         });
         
-        // Extraer el contenido HTML principal
+        // Extraer el <nav> del HTML
         const navbarContent = tempContainer.querySelector('nav') || tempContainer;
-        
-        // Crear contenedor para la navbar
-        const navbarContainer = document.createElement('div');
-        navbarContainer.id = 'navbar-container';
-        navbarContainer.innerHTML = navbarContent.innerHTML;
-        
-        // Insertar la navbar al principio del body
-        document.body.insertBefore(navbarContainer, document.body.firstChild);
+
+        // Insertar el <nav> directamente
+        document.body.insertBefore(navbarContent, document.body.firstChild);
         
         console.log('Navbar insertada en el DOM');
         
