@@ -279,22 +279,22 @@ function defineNavbarLogic() {
     if (overlay) {
         const overlaySpan = overlay.querySelector('span');
         if (overlaySpan) {
-            // Usamos currentLang actual
-            const t = translations[currentLang] || translations.es;
+            const t = translations[currentLang] || translations.es; // <- usar currentLang
             overlaySpan.textContent = t.loading;
         }
         overlay.classList.remove('hidden');
         overlay.style.display = 'flex';
     }
 
-    // Actualizamos cookie y currentLang
+    // Actualizamos cookie y currentLang después
     setCookie('preferred_language', lang, 365);
     currentLang = lang;
     document.documentElement.lang = lang;
+
     setupLinks();
     updateActiveLink();
 
-    // Redirigimos (updateTexts no afecta al overlay porque ya se muestra)
+    // Redirigir a la ruta con el idioma nuevo
     const newPath = buildPathWithLang(lang);
     if (newPath !== window.location.pathname) {
         window.location.replace(newPath);
@@ -357,11 +357,8 @@ function defineNavbarLogic() {
     if (mobileLangBtn) mobileLangBtn.addEventListener('click', openMobileLangPopup);
     const mobileLangEs = document.getElementById('mobile-lang-option-es');
     const mobileLangEn = document.getElementById('mobile-lang-option-en');
-    if (mobileLangEs) mobileLangEs.addEventListener('click', () => { changeLanguage('es'); closeMobileLangPopup(); });
-    if (mobileLangEn) mobileLangEn.addEventListener('click', () => { changeLanguage('en'); closeMobileLangPopup(); });
     const closeLangBtn = document.getElementById('close-lang-popup');
-    if (closeLangBtn) closeLangBtn.addEventListener('click', closeMobileLangPopup);
-
+    
     updateLangDropdown();
     // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
     
