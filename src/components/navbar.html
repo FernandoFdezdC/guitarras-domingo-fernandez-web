@@ -157,11 +157,11 @@ function defineNavbarLogic() {
   }
 
   function setupLinks() {
-    const basePath = `/${currentLang}`;
-    // rutas con trailing slash
-    const homeHref = `${basePath}/`;
-    const guitarsHref = `${basePath}/guitarras/`;
-    const contactHref = `${basePath}/contacto/`;
+    const pathname = window.location.pathname.replace(/\/index\.html$/, '/');
+    const homeHref = buildPathWithLang(currentLang); // raíz
+    const guitarsHref = buildPathWithLang(currentLang).replace(/\/$/, '') + '/guitarras/';
+    const contactHref = buildPathWithLang(currentLang).replace(/\/$/, '') + '/contacto/';
+
     const map = [
       ['nav-home', homeHref],
       ['nav-guitars', guitarsHref],
@@ -299,6 +299,23 @@ function defineNavbarLogic() {
 
     const ddEs = document.getElementById('lang-option-es');
     const ddEn = document.getElementById('lang-option-en');
+    function updateLangDropdown() {
+      const ddEs = document.getElementById('lang-option-es');
+      const ddEn = document.getElementById('lang-option-en');
+      if (!ddEs || !ddEn) return;
+
+      // Quitar la clase a ambos
+      ddEs.classList.remove('bg-[#aa2929]');
+      ddEn.classList.remove('bg-[#aa2929]');
+
+      // Aplicar al idioma actual
+      if (currentLang === 'es') {
+        ddEs.classList.add('bg-[#aa2929]');
+      } else if (currentLang === 'en') {
+        ddEn.classList.add('bg-[#aa2929]');
+      }
+    }
+    updateLangDropdown();
     if (ddEs) ddEs.addEventListener('click', () => changeLanguage('es'));
     if (ddEn) ddEn.addEventListener('click', () => changeLanguage('en'));
 
@@ -311,6 +328,7 @@ function defineNavbarLogic() {
     const closeLangBtn = document.getElementById('close-lang-popup');
     if (closeLangBtn) closeLangBtn.addEventListener('click', closeMobileLangPopup);
 
+    updateLangDropdown();
     // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
   }
 
