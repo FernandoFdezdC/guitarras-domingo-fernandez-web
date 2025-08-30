@@ -19,10 +19,10 @@
     <!-- Info de contacto -->
     <div class="mt-8 flex flex-col items-start gap-4">
       <p class="text-2xl">
-        Teléfono: <span class="font-bold" id="contact-phone"></span>
+        <span id="contact-phone-label"></span> <span class="font-bold" id="contact-phone"></span>
       </p>
       <p class="text-2xl">
-        Dirección: <span class="font-bold" id="contact-address"></span>
+        <span id="contact-address-label"></span> <span class="font-bold" id="contact-address"></span>
       </p>
     </div>
 
@@ -62,7 +62,11 @@
 
     // Actualizar info de contacto
     document.getElementById('contact-title').textContent = texts.contact.contact.title;
-    document.getElementById('contact-phone').textContent = texts.contact.contact.phone + ': +34 649 805 899';
+    // Actualizar info de contacto desde JSON, con la etiqueta fuera del span
+    document.getElementById('contact-phone-label').textContent = texts.contact.contact.phone + ':';
+    document.getElementById('contact-phone').textContent = texts.contact.contact.phoneNumber;
+
+    document.getElementById('contact-address-label').textContent = texts.contact.contact.address + ':';
     document.getElementById('contact-address').textContent = texts.contact.contact.addressName;
 
     // Actualizar placeholders
