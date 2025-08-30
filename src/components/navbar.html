@@ -274,12 +274,15 @@ function defineNavbarLogic() {
   function changeLanguage(lang) {
     if (lang !== 'es' && lang !== 'en') return;
 
+    // Si el idioma es el mismo, no hacemos nada
+    if (lang === currentLang) return;
+
     // Mostrar overlay con texto del idioma actual (antes de cambiar currentLang)
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
         const overlaySpan = overlay.querySelector('span');
         if (overlaySpan) {
-            const t = translations[currentLang] || translations.es; // <- usar currentLang
+            const t = translations[currentLang] || translations.es;
             overlaySpan.textContent = t.loading;
         }
         overlay.classList.remove('hidden');
@@ -358,7 +361,7 @@ function defineNavbarLogic() {
     const mobileLangEs = document.getElementById('mobile-lang-option-es');
     const mobileLangEn = document.getElementById('mobile-lang-option-en');
     const closeLangBtn = document.getElementById('close-lang-popup');
-    
+
     updateLangDropdown();
     // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
     
