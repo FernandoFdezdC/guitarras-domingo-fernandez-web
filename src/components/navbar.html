@@ -47,15 +47,15 @@
 </div>
 
 <!-- Popup de idioma móvil -->
-<div id="mobile-lang-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-    <div class="absolute bottom-0 left-0 right-0 bg-[#660000] rounded-t-2xl p-4">
-        <h3 class="text-white text-lg font-bold mb-4">Seleccionar idioma</h3>
-        <div class="flex flex-col gap-2">
-            <button id="mobile-lang-option-es" class="px-4 py-2 bg-[#aa2929] text-white rounded-lg">Español</button>
-            <button id="mobile-lang-option-en" class="px-4 py-2 bg-[#660000] hover:bg-[#aa2929] text-white rounded-lg">English</button>
-        </div>
-        <button id="close-lang-popup" class="mt-4 w-full px-4 py-2 bg-[#8B0000] text-white rounded-lg">Cerrar</button>
-    </div>
+<div id="mobile-lang-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-[#660000] p-6 rounded-lg w-64" id="mobile-lang-popup-content">
+    <button id="mobile-lang-option-es" class="w-full text-left py-3 px-4 rounded-md transition-colors text-white mb-2">
+      🇪🇸 Español
+    </button>
+    <button id="mobile-lang-option-en" class="w-full text-left py-3 px-4 rounded-md transition-colors text-white">
+      🇬🇧 English
+    </button>
+  </div>
 </div>
 
 <!-- Overlay de carga -->
@@ -350,6 +350,52 @@ function defineNavbarLogic() {
 
     updateLangDropdown();
     // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
+    
+    const mobileLangPopup = document.getElementById('mobile-lang-popup');
+
+    function updateMobileLangPopupStyles() {
+        if (!mobileLangEs || !mobileLangEn) return;
+        if (currentLang === 'es') {
+            mobileLangEs.classList.add('bg-[#AA2929]');
+            mobileLangEs.classList.remove('bg-[#660000]');
+            mobileLangEn.classList.remove('bg-[#AA2929]');
+            mobileLangEn.classList.add('bg-[#660000]');
+        } else {
+            mobileLangEn.classList.add('bg-[#AA2929]');
+            mobileLangEn.classList.remove('bg-[#660000]');
+            mobileLangEs.classList.remove('bg-[#AA2929]');
+            mobileLangEs.classList.add('bg-[#660000]');
+        }
+    }
+
+    if (mobileLangEs) mobileLangEs.addEventListener('click', () => {
+        changeLanguage('es');
+        if (mobileLangPopup) mobileLangPopup.classList.add('hidden');
+        updateMobileLangPopupStyles();
+    });
+    if (mobileLangEn) mobileLangEn.addEventListener('click', () => {
+        changeLanguage('en');
+        if (mobileLangPopup) mobileLangPopup.classList.add('hidden');
+        updateMobileLangPopupStyles();
+    });
+
+    if (closeLangBtn) closeLangBtn.addEventListener('click', () => {
+        if (mobileLangPopup) mobileLangPopup.classList.add('hidden');
+    });
+
+    // Cerrar al hacer click fuera del contenido
+    if (mobileLangPopup) {
+        mobileLangPopup.addEventListener('click', () => {
+            mobileLangPopup.classList.add('hidden');
+        });
+        const popupContent = mobileLangPopup.querySelector('div.absolute');
+        if (popupContent) {
+            popupContent.addEventListener('click', e => e.stopPropagation());
+        }
+    }
+
+    // Inicializar estilos al cargar
+    updateMobileLangPopupStyles();
   }
 
   // Exponer initNavbar globalmente para compatibilidad
