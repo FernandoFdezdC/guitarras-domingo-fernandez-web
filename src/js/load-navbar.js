@@ -1,85 +1,83 @@
 // js/load-navbar.js
 async function loadNavbar() {
-    try {
-        console.log('Cargando navbar...');
-        
-        // Hacer la petición para obtener el contenido de la navbar
-        const response = await fetch('/components/navbar.html');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const html = await response.text();
-        console.log('Navbar HTML obtenido:', html.length, 'caracteres');
-        
-        // Crear un contenedor temporal para procesar el HTML
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = html;
-        
-        // Extraer y agregar los estilos primero (manejar rutas CSS)
-        const styles = tempContainer.querySelectorAll('style, link[rel="stylesheet"]');
-        styles.forEach(style => {
-            console.log('Añadiendo estilo de la navbar');
-            
-            // Si es un enlace CSS, ajustar la ruta
-            if (style.tagName === 'LINK' && style.href) {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = style.href;
-                document.head.appendChild(link);
-            } else {
-                // Si es estilo inline
-                document.head.appendChild(style.cloneNode(true));
-            }
-        });
-        
-        // Extraer el <nav> del HTML
-        const navbarContent = tempContainer.querySelector('nav') || tempContainer;
+  try {
+    console.log('Cargando navbar...');
 
-        // Insertar el <nav> directamente
-        document.body.insertBefore(navbarContent, document.body.firstChild);
-        
-        console.log('Navbar insertada en el DOM');
-        
-        // Extraer y ejecutar los scripts de la navbar
-        const scripts = tempContainer.querySelectorAll('script');
-        scripts.forEach(script => {
-            if (script.src) {
-                // Script externo
-                const newScript = document.createElement('script');
-                newScript.src = script.src;
-                document.head.appendChild(newScript);
-            } else {
-                // Script inline - ejecutar directamente
-                try {
-                    console.log('Ejecutando script de la navbar');
-                    // Usar Function constructor para ejecutar en ámbito global
-                    const executeScript = new Function(script.textContent);
-                    executeScript();
-                } catch (error) {
-                    console.error('Error ejecutando script de navbar:', error);
-                }
-            }
-        });
-        
-        // Intentar llamar a initNavbar si existe
-        setTimeout(() => {
-            if (typeof initNavbar === 'function') {
-                console.log('Inicializando navbar...');
-                initNavbar();
-            } else {
-                console.warn('initNavbar no está definida. Intentando inicializar manualmente.');
-                initializeNavbarManually();
-            }
-        }, 100);
-        
-        console.log('Navbar cargada exitosamente');
-        
-    } catch (error) {
-        console.error('Error loading navbar:', error);
-        // Crear una navbar básica como fallback
-        createFallbackNavbar();
+    const response = await fetch('/components/navbar.html');
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const html = await response.text();
+
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = html;
+
+    // --- 1) Añadir estilos (resolviendo rutas relativas respecto a response.url)
+    const styles = Array.from(tempContainer.querySelectorAll('style, link[rel="stylesheet"]'));
+    styles.forEach(style => {
+      if (style.tagName === 'LINK') {
+        const href = style.getAttribute('href');
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        // resuelve rutas relativas contra la URL de la respuesta
+        link.href = href ? new URL(href, response.url).href : '';
+        document.head.appendChild(link);
+      } else {
+        document.head.appendChild(style.cloneNode(true));
+      }
+    });
+
+    // --- 2) Extraer scripts para recrearlos más tarde (y removemos los originales)
+    const scripts = Array.from(tempContainer.querySelectorAll('script'));
+    scripts.forEach(s => s.parentNode && s.parentNode.removeChild(s));
+
+    // --- 3) Mover todos los nodos top-level preservando el orden
+    const nodes = Array.from(tempContainer.childNodes);
+    // insertamos en orden correcto: iteramos de último a primero y los insertamos antes del primer hijo del body
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      document.body.insertBefore(nodes[i], document.body.firstChild);
     }
+
+    console.log('Navbar insertada en el DOM (todos los nodos).');
+
+    // --- 4) (Re)crear y ejecutar scripts en el orden original
+    for (const script of scripts) {
+      if (script.src) {
+        // script externo: crear nuevo <script src="..."> y esperar a load para preservar orden
+        const newScript = document.createElement('script');
+        newScript.src = new URL(script.getAttribute('src'), response.url).href;
+        newScript.async = false; // mantener orden
+        document.head.appendChild(newScript);
+        // esperar a que cargue para asegurar que funciones globales queden definidas
+        await new Promise((resolve, reject) => {
+          newScript.onload = () => resolve();
+          newScript.onerror = () => {
+            console.warn('Error cargando script externo de navbar:', newScript.src);
+            resolve(); // no abortamos la carga total, solo continuamos
+          };
+        });
+      } else {
+        // script inline: crear un nuevo <script> con el texto y añadir al head -> esto ejecuta el código
+        const inline = document.createElement('script');
+        inline.textContent = script.textContent;
+        document.head.appendChild(inline);
+      }
+    }
+
+    // --- 5) Inicializar la navbar (si existe la función)
+    if (typeof initNavbar === 'function') {
+      console.log('Inicializando navbar (initNavbar)...');
+      initNavbar();
+    } else {
+      console.warn('initNavbar no está definida. Intentando inicializar manualmente.');
+      if (typeof initializeNavbarManually === 'function') {
+        initializeNavbarManually();
+      }
+    }
+
+    console.log('Navbar cargada exitosamente');
+  } catch (error) {
+    console.error('Error loading navbar:', error);
+    createFallbackNavbar();
+  }
 }
 
 // Función de inicialización manual si initNavbar no está disponible

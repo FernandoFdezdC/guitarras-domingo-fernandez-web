@@ -195,7 +195,10 @@ function defineNavbarLogic() {
         const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
         if (targetPath !== currentPath) {
           const overlay = document.getElementById('loading-overlay');
-          if (overlay) overlay.classList.remove('hidden');
+          if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'flex'; // o 'block' según tu CSS
+          }
         }
         // no preventDefault: dejamos que navegue a la URL real
       });
@@ -291,6 +294,12 @@ function defineNavbarLogic() {
     setupLinks();
     setupNavLinkLoading();
     updateActiveLink();
+
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+    }
 
     // eventos UI
     const mobileBtn = document.getElementById('mobile-menu-button');
