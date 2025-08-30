@@ -1,0 +1,1 @@
+curl -X POST "https://q6oh44uilj.execute-api.eu-south-2.amazonaws.com/prod/contact" -H "Content-Type: application/json" -d "{\"name\": \"Fernando\", \"email\": \"test@gmail.com\", \"subject\": \"test\", \"message\": \"juygliuyh\", \"origin\": \"http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com\"}"

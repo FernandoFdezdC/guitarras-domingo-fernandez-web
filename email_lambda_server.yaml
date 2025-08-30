@@ -1,0 +1,167 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Provision HTTP API and Lambda to send emails
+
+Parameters:
+  Email:
+    Type: String
+    Description: Email (this will be the email with which the mails will be sent, and the sender's email will appear in the subject)
+  EmailPass:
+    Type: String
+    Description: Password or email API key
+  AllowedOrigins:
+    Type: CommaDelimitedList
+    Default: "https://guitarrasdomingofernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
+    Description: Allowed domains for CORS
+
+Resources:
+  EmailLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  EmailLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: EmailLambda
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Role: !GetAtt EmailLambdaRole.Arn
+      Code:
+        ZipFile: |
+          import nodemailer from "nodemailer";
+
+          // Mapa para rate limiting en memoria
+          const rateLimitMap = new Map();
+
+          // Configuración de rate limiting
+          const RATE_LIMIT_WINDOW = 60 * 1000; // 60 segundos
+          const MAX_REQUESTS = 5;
+
+          const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
+          export const handler = async (event) => {
+            try {
+              // --- Normalizar body
+              let data;
+              if (typeof event.body === "string") {
+                data = JSON.parse(event.body);
+              } else {
+                data = event.body || event;
+              }
+
+              const { name, email, subject, message, origin } = data;
+
+              // --- Validación CORS
+              if (!origin || !allowedOrigins.includes(origin)) {
+                return { statusCode: 403, body: JSON.stringify({ message: "Not allowed by CORS" }) };
+              }
+
+              // --- Rate limiting por IP
+              const ip = (event.headers && (event.headers["x-forwarded-for"] || event.headers["x-real-ip"])) || "unknown";
+              const now = Date.now();
+              const rateData = rateLimitMap.get(ip) || { count: 0, lastRequest: now };
+
+              if (now - rateData.lastRequest > RATE_LIMIT_WINDOW) {
+                rateData.count = 0;
+                rateData.lastRequest = now;
+              }
+              rateData.count++;
+              rateData.lastRequest = now;
+              rateLimitMap.set(ip, rateData);
+
+              if (rateData.count > MAX_REQUESTS) {
+                return { statusCode: 429, body: JSON.stringify({ message: "Rate limit exceeded" }) };
+              }
+
+              // --- Validación básica de campos
+              if (!name || !email || !subject || !message) {
+                return { statusCode: 400, body: JSON.stringify({ message: "Faltan campos obligatorios" }) };
+              }
+
+              // --- Configuración de Nodemailer
+              const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                  user: process.env.EMAIL_USER,
+                  pass: process.env.EMAIL_PASS,
+                },
+              });
+
+              // --- Envío de correo
+              await transporter.sendMail({
+                from: `"${name}" <${email}>`,
+                to: "ferfdezdelcerro@outlook.com",
+                subject,
+                text: message,
+                html: `<p><strong>De:</strong> ${name} (${email})</p><p>${message}</p>`,
+              });
+
+              return { statusCode: 200, body: JSON.stringify({ message: "Correo enviado" }) };
+            } catch (error) {
+              console.error("Error enviando correo:", error);
+              return { statusCode: 500, body: JSON.stringify({ message: "Error al enviar el correo", error: error.message }) };
+            }
+          };
+      Environment:
+        Variables:
+          EMAIL_USER: !Ref Email
+          EMAIL_PASS: !Ref EmailPass
+          ALLOWED_ORIGINS: !Join [ ",", !Ref AllowedOrigins ]
+
+  ContactApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: ContactAPI
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins: !Ref AllowedOrigins
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - POST
+          - OPTIONS
+        AllowCredentials: false
+        MaxAge: 0
+
+  PostIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ContactApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EmailLambda.Arn}/invocations
+      PayloadFormatVersion: "2.0"
+
+  PostRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ContactApi
+      RouteKey: "POST /contact"
+      Target: !Sub integrations/${PostIntegration}
+
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ContactApi
+      StageName: prod
+      AutoDeploy: true
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmailLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ContactApi}/*/POST/contact
+
+Outputs:
+  ContactApiUrl:
+    Description: URL del endpoint POST /contact
+    Value: !Sub "https://${ContactApi}.execute-api.${AWS::Region}.amazonaws.com/prod/contact"

@@ -80,7 +80,7 @@
     const form = document.getElementById("contact-form");
     const status = document.getElementById("form-status");
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const name = form.name.value;
@@ -88,15 +88,36 @@
       const subject = form.subject.value;
       const message = form.message.value;
 
-      // Construimos mailto
-      const mailto = `mailto:ferfdezdelcerro@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
-        "De: " + name + " (" + email + ")\n\n" + message
-      )}`;
+      // URL de tu Lambda (API Gateway)
+      const lambdaUrl = "https://q6oh44uilj.execute-api.eu-south-2.amazonaws.com/prod/contact";
 
-      // Abrir cliente de correo
-      window.location.href = mailto;
+      try {
+        const res = await fetch(lambdaUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            subject,
+            message,
+            origin: window.location.origin // para CORS
+          }),
+        });
 
-      status.innerHTML = `<span class='text-green-400 font-bold'>${texts.contact.contact.successMsg}</span>`;
+        const data = await res.json();
+
+        if (res.ok) {
+          status.innerHTML = `<span class='text-green-400 font-bold'>${texts.contact.contact.successMsg}</span>`;
+          form.reset();
+        } else {
+          status.innerHTML = `<span class='text-red-400 font-bold'>${data.message || "Error enviando el correo"}</span>`;
+        }
+      } catch (error) {
+        console.error("Error llamando Lambda:", error);
+        status.innerHTML = `<span class='text-red-400 font-bold'>Error de conexión con el servidor</span>`;
+      }
     });
   </script>
 </body>
