@@ -19,23 +19,26 @@
       "message": "Your message"
     }
   },
-  "guitars": [
-    {
-      "id": "guitar1",
-      "title": "guitar1",
-      "description": "Guitar 1 description."
-    },
-    {
-      "id": "guitar2",
-      "title": "guitar2",
-      "description": "Guitar 2 description."
-    },
-    {
-      "id": "guitar3",
-      "title": "guitar3",
-      "description": "Guitar 3 description."
-    }
-  ],
+  "guitars": {
+    "ourGuitars": "Our Guitars",
+    "list": [
+      {
+        "id": "guitar1",
+        "title": "guitar1",
+        "description": "Guitar 1 description."
+      },
+      {
+        "id": "guitar2",
+        "title": "guitar2",
+        "description": "Guitar 2 description."
+      },
+      {
+        "id": "guitar3",
+        "title": "guitar3",
+        "description": "Guitar 3 description."
+      }
+    ]
+  },
   "home": {
     "guitarDescription1": "Handcrafted guitars made from the finest wood",
     "guitarDescription2": "The perfect sound for the most demanding musicians.",

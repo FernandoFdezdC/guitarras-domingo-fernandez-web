@@ -97,7 +97,7 @@ function defineNavbarLogic() {
       loading: "Cargando..."
     },
     en: {
-      title: "Guitars Domingo Fernández",
+      title: "Domingo Fernández Guitars",
       home: "Home",
       guitars: "Guitars",
       contact: "Contact",
@@ -112,25 +112,31 @@ function defineNavbarLogic() {
   let langDropdownOpen = false;
 
   /* ---------- util rutas (preserva la ruta tras cambiar idioma) ---------- */
-  function buildPathWithLang(lang) {
-    // Reemplaza/Inserta el primer segmento de la ruta con lang.
-    const pathname = window.location.pathname;
-    const parts = pathname.split('/'); // ['', 'es', 'guitarras', ...] o ['', '']
+  function buildPathWithLang(lang, target = null) {
+    // Obtiene la ruta actual
+    const pathname = window.location.pathname.replace(/\/index\.html$/, '');
+    const parts = pathname.split('/'); // ['', 'es', 'guitarras', ...]
+
+    let newParts = [...parts];
+
+    // Si no hay idioma en la ruta, insertarlo
     if (!parts[1] || (parts[1] !== 'es' && parts[1] !== 'en')) {
-      // no hay segmento de idioma -> insertar
-      const newPath = (`/${lang}${pathname}`).replace(/\/+/g, '/');
-      return newPath.endsWith('/') ? newPath : newPath + '/';
-    } else if (parts[1] !== lang) {
-      parts[1] = lang;
-      let p = parts.join('/');
-      p = p.replace(/\/+/g, '/');
-      // Normalizar: si termina en /index.html quítalo
-      if (p.endsWith('/index.html')) p = p.replace(/\/index\.html$/, '/');
-      return p.endsWith('/') ? p : p + '/';
+        newParts = ['', lang];
     } else {
-      // ya está en el mismo idioma; normalizar trailing slash
-      return pathname.endsWith('/') ? pathname : pathname.replace(/\/index\.html$/, '/');
+        newParts[1] = lang; // Reemplaza el idioma
     }
+
+    // Si se pasa target, reemplaza la parte 2 o añade
+    if (target !== null) {
+        newParts = ['', lang, target];
+    }
+
+    let newPath = newParts.join('/').replace(/\/+/g, '/');
+
+    // Asegurar trailing slash
+    if (!newPath.endsWith('/')) newPath += '/';
+
+    return newPath;
   }
 
   /* ---------- actualizar textos y links ---------- */
@@ -157,24 +163,25 @@ function defineNavbarLogic() {
   }
 
   function setupLinks() {
-    const pathname = window.location.pathname.replace(/\/index\.html$/, '/');
-    const homeHref = buildPathWithLang(currentLang); // raíz
-    const guitarsHref = buildPathWithLang(currentLang).replace(/\/$/, '') + '/guitarras/';
-    const contactHref = buildPathWithLang(currentLang).replace(/\/$/, '') + '/contacto/';
+    const homeHref = buildPathWithLang(currentLang, '');               // /es/ o /en/
+    const guitarsHref = buildPathWithLang(currentLang, 'guitarras'); // /es/guitarras/
+    const contactHref = buildPathWithLang(currentLang, 'contacto');  // /es/contacto/
 
     const map = [
-      ['nav-home', homeHref],
-      ['nav-guitars', guitarsHref],
-      ['nav-contact', contactHref],
-      ['mobile-nav-home', homeHref],
-      ['mobile-nav-guitars', guitarsHref],
-      ['mobile-nav-contact', contactHref],
+        ['nav-home', homeHref],
+        ['nav-guitars', guitarsHref],
+        ['nav-contact', contactHref],
+        ['mobile-nav-home', homeHref],
+        ['mobile-nav-guitars', guitarsHref],
+        ['mobile-nav-contact', contactHref],
     ];
+
     map.forEach(([id, href]) => {
-      const el = document.getElementById(id);
-      if (el) el.setAttribute('href', href);
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('href', href);
     });
   }
+
 
   /* ---------- overlay loading: compara pathname (no href absoluto) ---------- */
   function setupNavLinkLoading() {

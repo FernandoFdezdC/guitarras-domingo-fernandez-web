@@ -19,23 +19,26 @@
       "message": "Tu mensaje"
     }
   },
-  "guitars": [
-    {
-      "id": "guitar1",
-      "title": "guitarra1",
-      "description": "Descripción de la guitarra 1."
-    },
-    {
-      "id": "guitar2",
-      "title": "guitarra2",
-      "description": "Descripción de la guitarra 2."
-    },
-    {
-      "id": "guitar3",
-      "title": "guitarra3",
-      "description": "Descripción de la guitarra 3."
-    }
-  ],
+  "guitars": {
+    "ourGuitars": "Nuestras Guitarras",
+    "list": [
+      {
+        "id": "guitar1",
+        "title": "guitarra1",
+        "description": "Descripción de la guitarra 1."
+      },
+      {
+        "id": "guitar2",
+        "title": "guitarra2",
+        "description": "Descripción de la guitarra 2."
+      },
+      {
+        "id": "guitar3",
+        "title": "guitarra3",
+        "description": "Descripción de la guitarra 3."
+      }
+    ]
+  },
   "home": {
     "guitarDescription1": "Guitarras artesanales hechas a mano con la mejor madera.",
     "guitarDescription2": "El sonido perfecto para los músicos más exigentes.",

@@ -1,53 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitars - Home</title>
+    <title>Guitarras - Inicio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/globals.css">
 </head>
 <body class="text-white min-h-screen p-8 sm:p-20">
-    <!-- The navbar will be automatically inserted here -->
-    
-    <!-- Main Content -->
+    <!-- La navbar se insertará aquí automáticamente -->
+    <script src="../js/load-navbar.js"></script>
+
+    <!-- Contenido principal -->
     <div class="container mx-auto">
-        <!-- Carousel -->
+        <!-- Carrusel -->
         <div class="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
             <!-- Slide Text -->
-            <p id="carousel-text" class="text-lg sm:max-w-sm">Discover the excellence in sound of our handcrafted guitars.</p>
+            <p id="carousel-text" class="text-lg sm:max-w-sm"></p>
             
             <!-- Slide Image -->
-            <img id="carousel-image" src="../images/guitar1.jpg" alt="Guitar" class="rounded-lg mt-4 sm:mt-0 w-[300px] h-[200px] object-cover">
+            <img id="carousel-image" src="../images/guitar1.jpg" alt="Guitarra" class="rounded-lg mt-4 sm:mt-0 w-[300px] h-[200px] object-cover">
         </div>
 
         <!-- About Us Section -->
         <div class="w-full flex flex-col px-4 sm:px-8 mt-8">
-            <h2 class="text-3xl sm:text-4xl font-bold text-center">About Us</h2>
-            <p class="mt-6 text-lg text-justify w-full">
-                We are passionate about crafting high-quality guitars. With years of experience 
-                and dedication, we create instruments that not only sound exceptionally well 
-                but are also works of art in themselves.
-            </p>
-            <p class="mt-6 text-lg text-justify w-full">
-                Every guitar we build is unique and designed to meet the specific needs 
-                of musicians who seek excellence in every note. Our process combines 
-                traditional techniques with modern innovation.
-            </p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-center"></h2>
+            <p class="mt-6 text-lg text-justify w-full"></p>
+            <p class="mt-6 text-lg text-justify w-full"></p>
         </div>
     </div>
 
-    <!-- Script to load the navbar -->
-    <script src="../js/load-navbar.js"></script>
+    <script type="module">
+        import { loadLocales } from '../js/load-locales.js';
 
-    <script>
-        // Texts for the carousel in English
+        // Cargar JSON en ingles
+        const texts = await loadLocales('en');
+
+        // Actualizar carrusel con textos del JSON
         const slides = [
-            { text: "Discover the excellence in sound of our handcrafted guitars.", image: "../images/guitar1.jpg" },
-            { text: "Each instrument is created with carefully selected woods and attention to detail.", image: "../images/guitar2.jpg" },
-            { text: "Experience the superior quality that sets us apart in every chord.", image: "../images/guitar3.jpg" }
+            { text: texts.home.guitarDescription1, image: "../images/guitar1.jpg" },
+            { text: texts.home.guitarDescription2, image: "../images/guitar2.jpg" },
+            { text: texts.home.guitarDescription3, image: "../images/guitar3.jpg" }
         ];
 
         let currentSlide = 0;
@@ -57,17 +52,22 @@
         function showSlide(index) {
             textElement.textContent = slides[index].text;
             imageElement.src = slides[index].image;
-            imageElement.alt = "Guitar " + (index + 1);
+            imageElement.alt = "Guitarra " + (index + 1);
         }
 
-        // Show the first slide
         showSlide(currentSlide);
-
-        // Change slide every 5 seconds
         setInterval(() => {
             currentSlide = (currentSlide + 1) % slides.length;
             showSlide(currentSlide);
         }, 5000);
+
+        // Actualizar sección "Sobre Nosotros"
+        const aboutTitle = document.querySelector('h2');
+        const paragraphs = document.querySelectorAll('div.w-full.flex.flex-col > p');
+
+        aboutTitle.textContent = texts.home.aboutUs;
+        paragraphs[0].textContent = texts.home.descriptionText;
+        paragraphs[1].textContent = texts.home.secondParagraph;
     </script>
 </body>
 </html>

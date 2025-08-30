@@ -11,15 +11,14 @@
 </head>
 <body class="text-white min-h-screen p-8 sm:p-20">
     <!-- La navbar se insertará aquí automáticamente -->
-    <!-- Script para cargar la navbar -->
     <script src="../js/load-navbar.js"></script>
-    
+
     <!-- Contenido principal -->
     <div class="container mx-auto">
         <!-- Carrusel -->
         <div class="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
             <!-- Slide Text -->
-            <p id="carousel-text" class="text-lg sm:max-w-sm">Descubre la excelencia en el sonido de nuestras guitarras artesanales.</p>
+            <p id="carousel-text" class="text-lg sm:max-w-sm"></p>
             
             <!-- Slide Image -->
             <img id="carousel-image" src="../images/guitar1.jpg" alt="Guitarra" class="rounded-lg mt-4 sm:mt-0 w-[300px] h-[200px] object-cover">
@@ -27,26 +26,23 @@
 
         <!-- About Us Section -->
         <div class="w-full flex flex-col px-4 sm:px-8 mt-8">
-            <h2 class="text-3xl sm:text-4xl font-bold text-center">Sobre Nosotros</h2>
-            <p class="mt-6 text-lg text-justify w-full">
-                Somos apasionados por la fabricación de guitarras de alta calidad. Con años de experiencia 
-                y dedicación, creamos instrumentos que no solo suenan excepcionalmente bien, sino que 
-                también son una obra de arte en sí mismos.
-            </p>
-            <p class="mt-6 text-lg text-justify w-full">
-                Cada guitarra que fabricamos es única y está diseñada para satisfacer las necesidades 
-                específicas de músicos que buscan excelencia en cada nota. Nuestro proceso combina 
-                técnicas tradicionales con innovación moderna.
-            </p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-center"></h2>
+            <p class="mt-6 text-lg text-justify w-full"></p>
+            <p class="mt-6 text-lg text-justify w-full"></p>
         </div>
     </div>
 
-    <script>
-        // Textos para el carrusel en español
+    <script type="module">
+        import { loadLocales } from '../js/load-locales.js';
+
+        // Cargar JSON en español
+        const texts = await loadLocales('es');
+
+        // Actualizar carrusel con textos del JSON
         const slides = [
-            { text: "Descubre la excelencia en el sonido de nuestras guitarras artesanales.", image: "../images/guitar1.jpg" },
-            { text: "Cada instrumento es creado con maderas seleccionadas y atención al detalle.", image: "../images/guitar2.jpg" },
-            { text: "Experimenta la calidad superior que nos distingue en cada acorde.", image: "../images/guitar3.jpg" }
+            { text: texts.home.guitarDescription1, image: "../images/guitar1.jpg" },
+            { text: texts.home.guitarDescription2, image: "../images/guitar2.jpg" },
+            { text: texts.home.guitarDescription3, image: "../images/guitar3.jpg" }
         ];
 
         let currentSlide = 0;
@@ -59,14 +55,19 @@
             imageElement.alt = "Guitarra " + (index + 1);
         }
 
-        // Mostrar el primer slide
         showSlide(currentSlide);
-
-        // Cambiar slide cada 5 segundos
         setInterval(() => {
             currentSlide = (currentSlide + 1) % slides.length;
             showSlide(currentSlide);
         }, 5000);
+
+        // Actualizar sección "Sobre Nosotros"
+        const aboutTitle = document.querySelector('h2');
+        const paragraphs = document.querySelectorAll('div.w-full.flex.flex-col > p');
+
+        aboutTitle.textContent = texts.home.aboutUs;
+        paragraphs[0].textContent = texts.home.descriptionText;
+        paragraphs[1].textContent = texts.home.secondParagraph;
     </script>
 </body>
 </html>
