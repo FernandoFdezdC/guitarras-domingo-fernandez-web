@@ -7,11 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/globals.css">
     <script>
-        const userLang = navigator.language || navigator.userLanguage;
-        if (userLang.startsWith('es')) {
-            window.location.href = '/es/';
-        } else {
-            window.location.href = '/en/';
+        // Solo redirigir si NO es navbar.html
+        const path = window.location.pathname;
+        if (path === '/' || path === '/index.html') {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('es')) {
+                window.location.href = '/es/';
+            } else {
+                window.location.href = '/en/';
+            }
         }
     </script>
 </head>

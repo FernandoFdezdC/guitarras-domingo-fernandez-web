@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto</title>
+
+  <!-- Tailwind + estilos -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../../css/globals.css">
+</head>
+<body class="text-white min-h-screen p-8 sm:p-20">
+  <!-- Navbar -->
+  <script src="../../js/load-navbar.js"></script>
+
+  <main class="container mx-auto">
+    <!-- Info de contacto -->
+    <div class="mt-8 flex flex-col items-start gap-4">
+      <p class="text-2xl">
+        Teléfono: <span class="font-bold">+34 649 805 899</span>
+      </p>
+      <p class="text-2xl">
+        Dirección: <span class="font-bold">Calle General Moscardó, n.º 16, Navahermosa (Toledo), España.</span>
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="mt-12 mx-auto w-full max-w-xl bg-red-800 p-8 rounded">
+      <h2 class="text-3xl font-bold mb-6 text-center">Envíanos un mensaje</h2>
+
+      <form id="contact-form" class="space-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Tu nombre"
+          required
+          class="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Tu correo"
+          required
+          class="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
+        />
+        <input
+          type="text"
+          name="subject"
+          placeholder="Asunto"
+          required
+          class="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
+        />
+        <textarea
+          name="message"
+          placeholder="Escribe tu mensaje..."
+          required
+          rows="5"
+          class="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
+        ></textarea>
+        <button
+          type="submit"
+          class="w-full bg-red-600 hover:bg-red-700 cursor-pointer text-white font-bold py-3 px-4 rounded text-lg"
+        >
+          <strong>Enviar mensaje</strong>
+        </button>
+      </form>
+
+      <p id="form-status" class="mt-4 text-center"></p>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = form.name.value;
+      const email = form.email.value;
+      const subject = form.subject.value;
+      const message = form.message.value;
+
+      // Construimos mailto
+      const mailto = `mailto:tu-correo@ejemplo.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+        "De: " + name + " (" + email + ")\n\n" + message
+      )}`;
+
+      // Abrir cliente de correo
+      window.location.href = mailto;
+
+      status.innerHTML = "<span class='text-green-400 font-bold'>📧 Abriendo tu cliente de correo...</span>";
+    });
+  </script>
+</body>
+</html>

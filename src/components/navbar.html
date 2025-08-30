@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="/css/navbar.css">
+
+<nav class="w-full flex items-center justify-between py-4 px-4 sm:px-8 navbar-bg">
+    <!-- Título a la izquierda -->
+    <span id="nav-title" class="text-3xl font-bold text-white">Guitarras Domingo Fernández</span>
+    
+    <!-- Contenedor para elementos de la derecha -->
+    <div class="flex items-center gap-6">
+        <!-- Enlaces de navegación (visible en desktop) -->
+        <div class="hidden sm:flex gap-6">
+            <a id="nav-home" href="#" class="nav-button inactive">Inicio</a>
+            <a id="nav-guitars" href="#" class="nav-button inactive">Guitarras</a>
+            <a id="nav-contact" href="#" class="nav-button inactive">Contacto</a>
+        </div>
+        
+        <!-- Selector de idioma desktop -->
+        <div class="hidden sm:block relative">
+            <button id="lang-trigger" type="button" class="transition-colors flex items-center justify-center text-white h-10 w-10 rounded-full bg-[#660000] hover:bg-[#CC3939] cursor-pointer">
+                <i class="fas fa-globe text-xl"></i>
+            </button>
+            
+            <div id="lang-dropdown" class="lang-popup hidden">
+                <div id="lang-option-es" class="lang-option rounded-t-lg">🇪🇸 Español</div>
+                <div id="lang-option-en" class="lang-option rounded-b-lg">🇬🇧 English</div>
+            </div>
+        </div>
+        
+        <!-- Botón de menú hamburguesa (solo móvil) -->
+        <button id="mobile-menu-button" class="sm:hidden text-white focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Menú móvil -->
+<div id="mobile-menu" class="sm:hidden w-full flex flex-col hidden">
+    <a id="mobile-nav-home" href="#" class="mobile-nav-item inactive">Inicio</a>
+    <a id="mobile-nav-guitars" href="#" class="mobile-nav-item inactive">Guitarras</a>
+    <a id="mobile-nav-contact" href="#" class="mobile-nav-item inactive">Contacto</a>
+    
+    <!-- Botón de idioma móvil -->
+    <div class="relative border-b-2 border-[#8B0000]">
+        <button id="mobile-lang-button" class="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center">
+            Idioma
+        </button>
+    </div>
+</div>
+
+<!-- Popup de idioma móvil -->
+<div id="mobile-lang-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="absolute bottom-0 left-0 right-0 bg-[#660000] rounded-t-2xl p-4">
+        <h3 class="text-white text-lg font-bold mb-4">Seleccionar idioma</h3>
+        <div class="flex flex-col gap-2">
+            <button id="mobile-lang-option-es" class="px-4 py-2 bg-[#aa2929] text-white rounded-lg">Español</button>
+            <button id="mobile-lang-option-en" class="px-4 py-2 bg-[#660000] hover:bg-[#aa2929] text-white rounded-lg">English</button>
+        </div>
+        <button id="close-lang-popup" class="mt-4 w-full px-4 py-2 bg-[#8B0000] text-white rounded-lg">Cerrar</button>
+    </div>
+</div>
+
+<!-- Overlay de carga -->
+<div id="loading-overlay" class="loading-overlay hidden">
+    <span class="text-white text-2xl">Cargando...</span>
+</div>

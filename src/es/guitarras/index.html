@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guitarras</title>
+
+  <!-- Tailwind + estilos globales -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../../css/globals.css">
+</head>
+<body class="text-white min-h-screen p-8 sm:p-20">
+  <!-- La navbar se insertará aquí automáticamente -->
+  <script src="../../js/load-navbar.js"></script>
+
+  <main class="container mx-auto">
+    <h2 class="text-3xl sm:text-4xl font-bold text-center mt-4 mb-8">Nuestras Guitarras</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+
+      <!-- Tarjeta 1 -->
+      <div class="border-2 border-red-500 p-4 rounded-lg">
+        <img src="../../images/guitar1.jpg" alt="Guitarra clásica" class="rounded-lg w-full h-[200px] object-cover">
+        <h3 class="mt-2 text-white font-bold text-2xl">Guitarra clásica</h3>
+        <p class="mt-1 text-white">Una guitarra tradicional perfecta para principiantes.</p>
+      </div>
+
+      <!-- Tarjeta 2 -->
+      <div class="border-2 border-red-500 p-4 rounded-lg">
+        <img src="../../images/guitar2.jpg" alt="Guitarra eléctrica" class="rounded-lg w-full h-[200px] object-cover">
+        <h3 class="mt-2 text-white font-bold text-2xl">Guitarra eléctrica</h3>
+        <p class="mt-1 text-white">Ideal para rock, metal y estilos modernos.</p>
+      </div>
+
+      <!-- Tarjeta 3 -->
+      <div class="border-2 border-red-500 p-4 rounded-lg">
+        <img src="../../images/guitar3.jpg" alt="Guitarra acústica" class="rounded-lg w-full h-[200px] object-cover">
+        <h3 class="mt-2 text-white font-bold text-2xl">Guitarra acústica</h3>
+        <p class="mt-1 text-white">Perfecta para acompañar canciones y tocar en solitario.</p>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>
