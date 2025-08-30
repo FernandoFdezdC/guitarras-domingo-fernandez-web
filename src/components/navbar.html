@@ -41,11 +41,9 @@
     <a id="mobile-nav-contact" href="#" class="mobile-nav-item inactive">Contacto</a>
     
     <!-- Botón de idioma móvil -->
-    <div class="relative border-b-2 border-[#8B0000]">
-        <button id="mobile-lang-button" class="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center">
-            Idioma
-        </button>
-    </div>
+    <a id="mobile-lang-button" href="javascript:void(0)" class="mobile-nav-item inactive">
+        Idioma
+    </a>
 </div>
 
 <!-- Popup de idioma móvil -->
@@ -157,7 +155,13 @@ function defineNavbarLogic() {
       if (el) el.textContent = txt;
     });
     const mobileLangBtn = document.getElementById('mobile-lang-button');
-    if (mobileLangBtn) mobileLangBtn.textContent = t.language;
+    if (mobileLangBtn) {
+      mobileLangBtn.addEventListener('click', () => {
+        openMobileLangPopup(); // abre el popup de idiomas
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) mobileMenu.classList.add('hidden'); // cierra el menú
+      });
+    }
     const overlaySpan = document.querySelector('#loading-overlay span');
     if (overlaySpan) overlaySpan.textContent = t.loading;
   }
