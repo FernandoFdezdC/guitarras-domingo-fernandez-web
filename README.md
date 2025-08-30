@@ -6,4 +6,6 @@ Webpage made with raw HTML, Javascript and CSS to demonstrate how to deploy it i
 
 To deploy into aws, use `aws s3 sync src s3://guitarras-domingo-fernandez-web`
 
+In order to avoid network caching on the browser, activate option "Disable cache" in Network tab.
+
 To automate deployment, use `./scripts/deploy.sh "YOUR_BUCKET_NAME" "YOUR_DISTRIBUTION_ID"`
