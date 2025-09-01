@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFront distribution with optional logging and ACM certificate
+
+Parameters:
+  WebsiteEndpoint:
+    Type: String
+    Description: "S3 website endpoint (e.g., my-bucket.s3-website-us-east-1.amazonaws.com)"
+
+  CloudFrontLogBucketParam:
+    Type: String
+    Description: "Optional bucket for CloudFront logs. Leave empty to disable logging."
+    Default: ""
+
+  AcmCertificateArn:
+    Type: String
+    Description: "ARN of the ACM certificate for guitarrasdomingofernandez.es (must be in us-east-1)"
+
+Conditions:
+  CreateLogBucket: !Not [!Equals [!Ref CloudFrontLogBucketParam, ""]]
+
+Resources:
+
+  # Optional CloudFront logs bucket
+  CloudFrontLogBucket:
+    Type: AWS::S3::Bucket
+    Condition: CreateLogBucket
+    Properties:
+      BucketName: !Ref CloudFrontLogBucketParam
+      AccessControl: LogDeliveryWrite
+
+  # CloudFront distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Origins:
+          - Id: WebsiteOrigin
+            DomainName: !Ref WebsiteEndpoint
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
+        DefaultCacheBehavior:
+          TargetOriginId: WebsiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        DefaultRootObject: index.html
+        Logging:
+          !If
+            - CreateLogBucket
+            - Bucket: !Ref CloudFrontLogBucketParam
+              IncludeCookies: false
+              Prefix: cloudfront-logs/
+            - !Ref "AWS::NoValue"
+        ViewerCertificate:
+          AcmCertificateArn: !Ref AcmCertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
