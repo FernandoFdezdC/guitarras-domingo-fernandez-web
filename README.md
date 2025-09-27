@@ -8,7 +8,7 @@ To deploy into aws, use `aws s3 sync src s3://guitarras-domingo-fernandez`
 
 In order to avoid network caching on the browser, activate option "Disable cache" in Network tab.
 
-To automate deployment, use `./scripts/deploy.sh "YOUR_BUCKET_NAME" "YOUR_DISTRIBUTION_ID"`
+To automate deployment, use `./scripts/deploy.sh "YOUR_BUCKET_NAME" "YOUR_DISTRIBUTION_ID"` (it works with `AWS CLI` version `aws-cli/2.28.21 Python/3.13.7 Windows/11 exe/AMD64`).
 
 Create a CloudFront distribution and add a `custom SSL certificate` to the CloudFront distribution (for example, an ACM certificate). Note that in `route 53` the assignation to the CloudFront distribution is also necessary: assign the record name with the CloudFront Distribution domain name (example: `d3ccausbv8iue6.cloudfront.net`) through Alias type (A type + Alias activated). It is also important that the CloudFront distribution has the S3 website endpoint as origin and not the bucket itself.
 
