@@ -13,7 +13,7 @@ const slides = [
 ];
 
 export default function Home() {
-  // Recuperamos el lang dinámico
+  // Retrieve language dynamically
   const { lang } = useParams() as { lang?: string };
   const t = useLocaleDictionary(lang || 'es').home; // fallback
 

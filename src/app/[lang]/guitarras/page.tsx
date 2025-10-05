@@ -6,7 +6,7 @@ import { useLocaleDictionary } from '@/app/lib/useLocaleDictionary';
 import GuitarCard from "@/app/components/guitarCard";
 
 export default function Guitarras() {
-  // Recuperamos el lang dinámico
+  // Retrieve language dynamically
   const { lang } = useParams() as { lang?: string };
   const t = useLocaleDictionary(lang || 'es').guitars; // fallback
 

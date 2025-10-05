@@ -40,8 +40,8 @@ export default function LanguageMobilePopup({
         <button
           type="button"
           onClick={() => {
-            handleLanguageChange("en"); // Espera a que termine
-            setLanguagePopupOpen(false);    // Luego cierra
+            handleLanguageChange("en"); // Wait for it to finish
+            setLanguagePopupOpen(false);    // Then close the popup
           }}
           className={`w-full text-left py-3 px-4 rounded-md transition-colors ${
             currentLanguage === 'en' 

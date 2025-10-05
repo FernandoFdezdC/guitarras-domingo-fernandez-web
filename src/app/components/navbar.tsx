@@ -10,7 +10,7 @@ import { useParams } from 'next/navigation';
 import { useLocaleDictionary } from '../lib/useLocaleDictionary';
 
 export default function Navbar() {
-  // Recuperamos el lang dinámico
+  // Retrieve language dynamically
   const { lang } = useParams() as { lang?: string };
   const t = useLocaleDictionary(lang || 'es').navbar; // fallback
 
@@ -19,13 +19,13 @@ export default function Navbar() {
   const [currentLang, setCurrentLang] = useState<"es" | "en">("es");
   const [langPopupOpen, setLangPopupOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const initialized = useRef(false); // Control de inicialización
+  const initialized = useRef(false); // Initialization control
 
   const langPopupStyle = "absolute top-full mt-2 right-0 bg-[#660000] rounded-lg shadow-lg z-50";
   const langOptionStyle = "px-4 py-2 hover:bg-[#aa2929] text-white cursor-pointer transition-colors";
 
   
-  // Leer cookie SOLO después de la hidratación. Esto se ejecuta en el navegador del cliente.
+  // Read cookie ONLY after hydration. This runs in the client's browser.
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
@@ -47,14 +47,14 @@ export default function Navbar() {
   // Define router
   const router = useRouter();
   useEffect(() => {
-    // Obtener el path actual y modificar el segmento del idioma
-    const currentPath = window.location.pathname; // Ej.: "/en/inicio" o "/es/contacto"
+    // Get the current path and modify the language segment
+    const currentPath = window.location.pathname; // Example: "/en/inicio" or "/es/contacto"
     const pathParts = currentPath.split("/"); // ["", "en", "inicio"]
-    // Suponemos que el idioma es el primer segmento (índice 1)
+    // We assume the language is the first segment (index 1)
     pathParts[1] = currentLang;
     const newPath = pathParts.join("/") || "/";
 
-    // Redirigir al nuevo path
+    // Redirect to new path
     router.push(newPath);
   }, [currentLang, router]);
 
@@ -81,7 +81,7 @@ export default function Navbar() {
     };
   }, [langDropdownOpen]);
   
-  // Cambiar idioma con interacción explícita. Esto se ejecuta en el navegador del cliente también
+  // Change language via explicit interaction. This also runs in the client's browser
   const changeLanguage = (lang: "es" | "en") => {
     // console.log("changed language");
     document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict; Secure`;
@@ -93,7 +93,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    setIsNavigating(false); // Restablecer cuando cambie la ruta
+    setIsNavigating(false); // Reset when the route changes
   }, [pathname]);
 
   return (
@@ -136,7 +136,7 @@ export default function Navbar() {
           >
             {t.contact}
           </Link>
-          {/* Botón Idioma Desktop */}
+          {/* Desktop Language Button */}
           <div className="relative">
             <button
               ref={langTriggerRef}
@@ -192,7 +192,7 @@ export default function Navbar() {
             href={`/${currentLang}`}
             onClick={() => {
               if (pathname !== `/${currentLang}`) setIsNavigating(true);
-              setMenuOpen(false); // Cerrar menú móvil
+              setMenuOpen(false); // Close mobile menu
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
               /^\/[a-zA-Z]{2,3}\/?$/.test(pathname)
@@ -206,7 +206,7 @@ export default function Navbar() {
             href={`/${currentLang}/guitarras`}
             onClick={() => { 
               if (pathname !== "/guitarras") setIsNavigating(true);
-              setMenuOpen(false); // Cerrar menú móvil
+              setMenuOpen(false); // Close mobile menu
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
               pathname.endsWith('/guitarras')
@@ -220,7 +220,7 @@ export default function Navbar() {
             href={`/${currentLang}/contacto`}
             onClick={() => { 
               if (pathname !== `/${currentLang}/contacto`) setIsNavigating(true);
-              setMenuOpen(false); // Cerrar menú móvil
+              setMenuOpen(false); // Close mobile menu
             }}
             className={`transition-colors flex items-center justify-center text-white font-medium text-sm h-12 w-full px-0 border-b-2 border-[#8B0000] text-center ${
               pathname.endsWith('/contacto')
@@ -230,12 +230,12 @@ export default function Navbar() {
           >
             {t.contact}
           </Link>
-          {/* Botón Idioma Mobile */}
+          {/* Mobile Language Button */}
           <div className="relative border-b-2 border-[#8B0000]">
             <button
               onClick={() => {
-                setLangPopupOpen(true);   // Abre el popup de idioma
-                setMenuOpen(false); // Cerrar menú móvil
+                setLangPopupOpen(true);   // Open language popup
+                setMenuOpen(false); // Close mobile menu
               }}
               className="w-full text-white font-medium text-sm h-12 bg-[#660000] hover:bg-[#aa2929] px-4 text-center"
             >
@@ -244,7 +244,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
-      {/* Popup de Idioma */}
+      {/* Language Popup */}
       {langPopupOpen && (
         <LanguageMobilePopup
           currentLanguage={currentLang}

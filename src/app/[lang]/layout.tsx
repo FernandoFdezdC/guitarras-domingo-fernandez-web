@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import Navbar from "../components/navbar"; // shared component
 
-// You can generate metadata dynamically based on the lang param.
+// We can generate metadata dynamically based on the lang param.
 export async function generateMetadata({
   params,
 }: {
@@ -26,7 +26,7 @@ export default function LangLayout({
   children: React.ReactNode;
   params: { lang: string };
 }) {
-  // You can use params.lang to set the <html lang> attribute, etc.
+  // We can use params.lang to set the <html lang> attribute, etc.
   return (
     <div className="bg-black text-white min-h-screen p-8 sm:p-20">
       <Navbar />

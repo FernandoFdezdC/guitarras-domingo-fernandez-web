@@ -6,7 +6,7 @@ import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
 import { useState } from 'react';
 
 export default function ContactPage() {
-  // Recuperamos el lang dinámico
+  // Retrieve language dynamically
   const { lang } = useParams() as { lang?: string };
   const t = useLocaleDictionary(lang || 'es').contact; // fallback
 
@@ -67,7 +67,7 @@ export default function ContactPage() {
         </p>
       </div>
 
-      {/* Contenedor del formulario centrado */}
+      {/* Form centered container */}
       <div className="mt-12 mx-auto w-full max-w-xl bg-red-800 p-8 rounded">
         <h2 className="text-3xl font-bold mb-6 text-center">{t.contact.title}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
