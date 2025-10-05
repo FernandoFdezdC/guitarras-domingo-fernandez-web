@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 
-// Mapa para rate limiting en memoria
+// In-memory map for rate limiting
 const rateLimitMap = new Map();
 
-// Configuración de rate limiting
+// Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60 * 1000; // 60 segundos
 const MAX_REQUESTS = 5;
 
@@ -11,7 +11,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
 export const handler = async (event) => {
   try {
-    // --- Normalizar body
+    // --- Normalize body
     let data;
     if (typeof event.body === "string") {
       data = JSON.parse(event.body);
@@ -21,12 +21,12 @@ export const handler = async (event) => {
 
     const { name, email, subject, message, origin } = data;
 
-    // --- Validación CORS
+    // --- CORS validation
     if (!origin || !allowedOrigins.includes(origin)) {
       return { statusCode: 403, body: JSON.stringify({ message: "Not allowed by CORS" }) };
     }
 
-    // --- Rate limiting por IP
+    // --- Rate limiting by IP
     const ip = (event.headers && (event.headers["x-forwarded-for"] || event.headers["x-real-ip"])) || "unknown";
     const now = Date.now();
     const rateData = rateLimitMap.get(ip) || { count: 0, lastRequest: now };
@@ -43,12 +43,12 @@ export const handler = async (event) => {
       return { statusCode: 429, body: JSON.stringify({ message: "Rate limit exceeded" }) };
     }
 
-    // --- Validación básica de campos
+    // --- Basic field validation
     if (!name || !email || !subject || !message) {
       return { statusCode: 400, body: JSON.stringify({ message: "Faltan campos obligatorios" }) };
     }
 
-    // --- Configuración de Nodemailer
+    // --- Nodemailer configuration
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -57,18 +57,18 @@ export const handler = async (event) => {
       },
     });
 
-    // --- Envío de correo
+    // --- Send email
     await transporter.sendMail({
       from: `"${name}" <${email}>`,
       to: "ferfdezdelcerro@outlook.com",
       subject,
       text: message,
-      html: `<p><strong>De:</strong> ${name} (${email})</p><p>${message}</p>`,
+      html: `<p><strong>From:</strong> ${name} (${email})</p><p>${message}</p>`,
     });
 
-    return { statusCode: 200, body: JSON.stringify({ message: "Correo enviado" }) };
+    return { statusCode: 200, body: JSON.stringify({ message: "Email sent" }) };
   } catch (error) {
-    console.error("Error enviando correo:", error);
-    return { statusCode: 500, body: JSON.stringify({ message: "Error al enviar el correo", error: error.message }) };
+    console.error("Error sending email:", error);
+    return { statusCode: 500, body: JSON.stringify({ message: "Error sending email", error: error.message }) };
   }
 };

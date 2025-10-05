@@ -27,7 +27,7 @@ To automate deployment, use `./scripts/deploy.sh "BUCKET_NAME" "DISTRIBUTION_ID"
 
 ## General information
 
-`src` folder contains all the static files that are used to create the static site, while `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
+`src` folder contains all the static files that are used to create the static site, while `lambda` folder contains the script executed by the `AWS` Lambda function. `lambda/lambda_test.json` contains a call to test the lambda function behaviour. `src/index.html` is the entrypoint of the website.
 
 `src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
 
