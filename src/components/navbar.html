@@ -1,19 +1,19 @@
 <link rel="stylesheet" href="/css/navbar.css">
 
 <nav class="w-full flex items-center justify-between py-4 px-4 sm:px-8 bg-[#4d0000] transition-transform duration-300">
-    <!-- Título a la izquierda -->
+    <!-- Title on the left -->
     <span id="nav-title" class="text-3xl font-bold text-white">Guitarras Domingo Fernández</span>
     
-    <!-- Contenedor para elementos de la derecha -->
+    <!-- Container for right-side elements -->
     <div class="flex items-center gap-6">
-        <!-- Enlaces de navegación (visible en desktop) -->
+        <!-- Navigation links (visible on desktop) -->
         <div class="hidden sm:flex gap-6">
             <a id="nav-home" href="#" class="nav-button inactive">Inicio</a>
             <a id="nav-guitars" href="#" class="nav-button inactive">Guitarras</a>
             <a id="nav-contact" href="#" class="nav-button inactive">Contacto</a>
         </div>
         
-        <!-- Selector de idioma desktop -->
+        <!-- Desktop language selector -->
         <div class="hidden sm:block relative">
             <button id="lang-trigger" type="button" class="transition-colors flex items-center justify-center text-white h-10 w-10 rounded-full bg-[#660000] hover:bg-[#CC3939] cursor-pointer">
                 <i class="fas fa-globe text-xl"></i>
@@ -25,7 +25,7 @@
             </div>
         </div>
         
-        <!-- Botón de menú hamburguesa (solo móvil) -->
+        <!-- Hamburger menu button (mobile only) -->
         <button id="mobile-menu-button" class="sm:hidden text-white focus:outline-none">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -34,19 +34,19 @@
     </div>
 </nav>
 
-<!-- Menú móvil -->
+<!-- Mobile menu -->
 <div id="mobile-menu" class="sm:hidden w-full flex flex-col hidden">
     <a id="mobile-nav-home" href="#" class="mobile-nav-item inactive">Inicio</a>
     <a id="mobile-nav-guitars" href="#" class="mobile-nav-item inactive">Guitarras</a>
     <a id="mobile-nav-contact" href="#" class="mobile-nav-item inactive">Contacto</a>
     
-    <!-- Botón de idioma móvil -->
+    <!-- Mobile language button -->
     <a id="mobile-lang-button" href="javascript:void(0)" class="mobile-nav-item inactive">
         Idioma
     </a>
 </div>
 
-<!-- Popup de idioma móvil -->
+<!-- Mobile language popup -->
 <div id="mobile-lang-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
   <div class="bg-[#660000] p-6 rounded-lg w-64" id="mobile-lang-popup-content">
     <button id="mobile-lang-option-es" class="w-full text-left py-3 px-4 rounded-md transition-colors text-white mb-2">
@@ -58,19 +58,19 @@
   </div>
 </div>
 
-<!-- Overlay de carga -->
+<!-- Loading overlay -->
 <div id="loading-overlay" class="loading-overlay hidden">
     <span class="text-white text-2xl">Cargando...</span>
 </div>
 
 <script>
-/* ---------- Helpers y lógica de la navbar (inyectados aquí) ---------- */
+/* ---------- Navbar helpers and logic ---------- */
 function defineNavbarLogic() {
-  // Si ya definimos la lógica antes, no redefinir
+  // If the logic has already been defined before, do not redefine it
   if (window._navbarLogicDefined) return;
   window._navbarLogicDefined = true;
 
-  /* ---------- cookies helpers ---------- */
+  /* ---------- cookie helpers ---------- */
   function getCookie(name) {
     const v = `; ${document.cookie}`;
     const parts = v.split(`; ${name}=`);
@@ -84,7 +84,7 @@ function defineNavbarLogic() {
     document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Lax`;
   }
 
-  /* ---------- traducciones simples ---------- */
+  /* ---------- simple translations ---------- */
   const translations = {
     es: {
       title: "Guitarras Domingo Fernández",
@@ -104,40 +104,40 @@ function defineNavbarLogic() {
     }
   };
 
-  /* ---------- Estado ---------- */
+  /* ---------- State ---------- */
   let currentLang = 'es';
   let menuOpen = false;
   let langDropdownOpen = false;
 
-  /* ---------- util rutas (preserva la ruta tras cambiar idioma) ---------- */
+  /* ---------- route utility (preserves path after language change) ---------- */
   function buildPathWithLang(lang, target = null) {
-    // Obtiene la ruta actual
+    // Get the current path
     const pathname = window.location.pathname.replace(/\/index\.html$/, '');
     const parts = pathname.split('/'); // ['', 'es', 'guitarras', ...]
 
     let newParts = [...parts];
 
-    // Si no hay idioma en la ruta, insertarlo
+    // If there is no language in the path, insert it
     if (!parts[1] || (parts[1] !== 'es' && parts[1] !== 'en')) {
         newParts = ['', lang];
     } else {
-        newParts[1] = lang; // Reemplaza el idioma
+        newParts[1] = lang; // Replace language
     }
 
-    // Si se pasa target, reemplaza la parte 2 o añade
+    // If a target is provided, replace the second part or add it
     if (target !== null) {
         newParts = ['', lang, target];
     }
 
     let newPath = newParts.join('/').replace(/\/+/g, '/');
 
-    // Asegurar trailing slash
+    // Ensure trailing slash
     if (!newPath.endsWith('/')) newPath += '/';
 
     return newPath;
   }
 
-  /* ---------- actualizar textos y links ---------- */
+  /* ---------- update texts and links ---------- */
   function updateTexts() {
     const t = translations[currentLang] || translations.es;
     const elTitle = document.getElementById('nav-title');
@@ -158,9 +158,9 @@ function defineNavbarLogic() {
     const mobileLangBtn = document.getElementById('mobile-lang-button');
     if (mobileLangBtn) {
       mobileLangBtn.addEventListener('click', () => {
-        openMobileLangPopup(); // abre el popup de idiomas
+        openMobileLangPopup(); // open language popup
         const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileMenu) mobileMenu.classList.add('hidden'); // cierra el menú
+        if (mobileMenu) mobileMenu.classList.add('hidden'); // close the menu
       });
     }
     const overlaySpan = document.querySelector('#loading-overlay span');
@@ -168,7 +168,7 @@ function defineNavbarLogic() {
   }
 
   function setupLinks() {
-    const homeHref = buildPathWithLang(currentLang, '');               // /es/ o /en/
+    const homeHref = buildPathWithLang(currentLang, '');               // /es/ or /en/
     const guitarsHref = buildPathWithLang(currentLang, 'guitarras'); // /es/guitarras/
     const contactHref = buildPathWithLang(currentLang, 'contacto');  // /es/contacto/
 
@@ -187,25 +187,24 @@ function defineNavbarLogic() {
     });
   }
 
-
-  /* ---------- overlay loading: compara pathname (no href absoluto) ---------- */
+  /* ---------- loading overlay ---------- */
   function setupNavLinkLoading() {
     const navIds = ['nav-home', 'nav-guitars', 'nav-contact', 'mobile-nav-home', 'mobile-nav-guitars', 'mobile-nav-contact'];
     navIds.forEach(id => {
       const link = document.getElementById(id);
       if (!link) return;
       link.addEventListener('click', (e) => {
-        // obtener pathname del enlace
+        // get the pathname of the link
         const targetPath = new URL(link.href, window.location.origin).pathname.replace(/\/index\.html$/, '/');
         const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
         if (targetPath !== currentPath) {
           const overlay = document.getElementById('loading-overlay');
           if (overlay) {
             overlay.classList.remove('hidden');
-            overlay.style.display = 'flex'; // o 'block' según tu CSS
+            overlay.style.display = 'flex'; // or 'block' depending on the CSS
           }
         }
-        // no preventDefault: dejamos que navegue a la URL real
+        // No preventDefault: allow navigation to the actual URL
       });
     });
   }
@@ -238,7 +237,7 @@ function defineNavbarLogic() {
     }
   }
 
-  /* ---------- toggles UI ---------- */
+  /* ---------- UI toggles ---------- */
   function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobile-menu');
     if (!mobileMenu) return;
@@ -271,14 +270,14 @@ function defineNavbarLogic() {
     if (popup) popup.classList.add('hidden');
   }
 
-  /* ---------- cambio de idioma (preserva la ruta) ---------- */
+  /* ---------- change language ---------- */
   function changeLanguage(lang) {
     if (lang !== 'es' && lang !== 'en') return;
 
-    // Si el idioma es el mismo, no hacemos nada
+    // If the language is the same, do nothing
     if (lang === currentLang) return;
 
-    // Mostrar overlay con texto del idioma actual (antes de cambiar currentLang)
+    // Show overlay with the current language text (before changing currentLang)
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
         const overlaySpan = overlay.querySelector('span');
@@ -290,7 +289,7 @@ function defineNavbarLogic() {
         overlay.style.display = 'flex';
     }
 
-    // Actualizamos cookie y currentLang después
+    // We update the cookie and currentLang afterwards
     setCookie('preferred_language', lang, 365);
     currentLang = lang;
     document.documentElement.lang = lang;
@@ -298,16 +297,16 @@ function defineNavbarLogic() {
     setupLinks();
     updateActiveLink();
 
-    // Redirigir a la ruta con el idioma nuevo
+    // Redirect to the route with the new language
     const newPath = buildPathWithLang(lang);
     if (newPath !== window.location.pathname) {
         window.location.replace(newPath);
     }
   }
 
-  /* ---------- initNavbar (NO redirige automáticamente) ---------- */
+  /* ---------- initialize navbar ---------- */
   function initNavbarInner() {
-    // cookie
+    // language cookie
     const cookieLang = getCookie('preferred_language');
     if (cookieLang === 'es' || cookieLang === 'en') currentLang = cookieLang;
     document.documentElement.lang = currentLang;
@@ -323,7 +322,7 @@ function defineNavbarLogic() {
       overlay.style.display = 'none';
     }
 
-    // eventos UI
+    // UI events
     const mobileBtn = document.getElementById('mobile-menu-button');
     if (mobileBtn) mobileBtn.addEventListener('click', toggleMobileMenu);
 
@@ -342,11 +341,11 @@ function defineNavbarLogic() {
       const ddEn = document.getElementById('lang-option-en');
       if (!ddEs || !ddEn) return;
 
-      // Quitar la clase a ambos
+      // Remove class to both of them
       ddEs.classList.remove('bg-[#aa2929]');
       ddEn.classList.remove('bg-[#aa2929]');
 
-      // Aplicar al idioma actual
+      // Apply the current language
       if (currentLang === 'es') {
         ddEs.classList.add('bg-[#aa2929]');
       } else if (currentLang === 'en') {
@@ -364,7 +363,7 @@ function defineNavbarLogic() {
     const closeLangBtn = document.getElementById('close-lang-popup');
 
     updateLangDropdown();
-    // No redirigimos aquí por diseño: la página root (/index.html) es la responsable de redireccionar a /es/ o /en/ si procede.
+    // We do not redirect here by design: the root page (/index.html) is responsible for redirecting to /es/ or /en/ if applicable
     
     const mobileLangPopup = document.getElementById('mobile-lang-popup');
 
@@ -398,7 +397,7 @@ function defineNavbarLogic() {
         if (mobileLangPopup) mobileLangPopup.classList.add('hidden');
     });
 
-    // Cerrar al hacer click fuera del contenido
+    // Close when clicking outside the content
     if (mobileLangPopup) {
         mobileLangPopup.addEventListener('click', () => {
             mobileLangPopup.classList.add('hidden');
@@ -409,14 +408,14 @@ function defineNavbarLogic() {
         }
     }
 
-    // Inicializar estilos al cargar
+    // Initialize styles when loading
     updateMobileLangPopupStyles();
   }
 
-  // Exponer initNavbar globalmente para compatibilidad
+  // Expose initNavbar globally for compatibility
   window.initNavbar = initNavbarInner;
 
-  // Función de cierre del dropdown cuando se hace click fuera
+  // Dropdown close function when clicking outside
   function docCloseHandler(e) {
     const langTrigger = document.getElementById('lang-trigger');
     const langDropdown = document.getElementById('lang-dropdown');
@@ -431,16 +430,15 @@ function defineNavbarLogic() {
     document.removeEventListener('click', docCloseHandler);
   }
 
-  // Función manual de inicialización en caso de que initNavbar no exista (fallback)
+  // Manual initialization function in case initNavbar does not exist (fallback)
   window.initializeNavbarManually = function initializeNavbarManually() {
-    console.log('[navbar] inicializando manualmente (fallback)...');
-    // Botón de menú móvil
+    console.log('[navbar] manually initializing (fallback)...');
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileMenuButton && mobileMenu) {
       mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
     }
-    // Selector de idioma básico
+    // Basic language selector
     const langTrigger = document.getElementById('lang-trigger');
     const langDropdown = document.getElementById('lang-dropdown');
     if (langTrigger && langDropdown) {
@@ -454,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initNavbar === 'function') {
         initNavbar();
     } else {
-        console.warn('initNavbar no está definida. Inicializando manualmente.');
+        console.warn('initNavbar is not defined. Initializing manually.');
         if (typeof initializeNavbarManually === 'function') {
             initializeNavbarManually();
         }

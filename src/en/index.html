@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitarras - Inicio</title>
+    <title>Guitars - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/globals.css">
 </head>
 <body class="text-white min-h-screen p-8 sm:p-20">
-    <!-- La navbar se insertará aquí automáticamente -->
+    <!-- Navbar will be automatically inserted here -->
     <script src="../js/load-navbar.js"></script>
 
-    <!-- Contenido principal -->
+    <!-- Main content -->
     <div class="container mx-auto">
-        <!-- Carrusel -->
+        <!-- Carousel -->
         <div class="w-full mt-8 flex flex-col sm:flex-row items-center justify-between border-4 border-[#C62828] p-4 sm:p-6 rounded-lg">
             <!-- Slide Text -->
             <p id="carousel-text" class="text-lg sm:max-w-sm"></p>
@@ -35,10 +35,10 @@
     <script type="module">
         import { loadLocales } from '../js/load-locales.js';
 
-        // Cargar JSON en ingles
+        // Load English translation
         const texts = await loadLocales('en');
 
-        // Actualizar carrusel con textos del JSON
+        // Update carousel with translation texts
         const slides = [
             { text: texts.home.guitarDescription1, image: "../images/guitar1.jpg" },
             { text: texts.home.guitarDescription2, image: "../images/guitar2.jpg" },
@@ -61,7 +61,7 @@
             showSlide(currentSlide);
         }, 5000);
 
-        // Actualizar sección "Sobre Nosotros"
+        // Update "About Us" section
         const aboutTitle = document.querySelector('h2');
         const paragraphs = document.querySelectorAll('div.w-full.flex.flex-col > p');
 

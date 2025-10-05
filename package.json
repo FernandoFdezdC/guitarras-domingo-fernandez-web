@@ -1,7 +1,7 @@
 {
   "name": "guitarras-domingo-fernandez-web",
   "version": "1.0.0",
-  "description": "guitarrasdomingofernandez-web",
+  "description": "guitarras domingo fernandez web",
   "main": "index.js",
   "directories": {
     "test": "test"

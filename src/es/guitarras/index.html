@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Guitarras</title>
 
-  <!-- Tailwind + estilos globales -->
+  <!-- Tailwind + global styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../../css/globals.css">
 </head>
 <body class="text-white min-h-screen p-8 sm:p-20">
-  <!-- La navbar se insertará aquí automáticamente -->
+  <!-- Navbar will be automatically inserted here -->
   <script src="../../js/load-navbar.js"></script>
 
   <main class="container mx-auto">
@@ -20,21 +20,21 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
 
-      <!-- Tarjeta 1 -->
+      <!-- Card 1 -->
       <div class="border-2 border-red-500 p-4 rounded-lg">
         <img src="../../images/guitar1.jpg" alt="Guitarra 1" class="rounded-lg w-full h-[200px] object-cover">
         <h3 class="mt-2 text-white font-bold text-2xl"></h3>
         <p class="mt-1 text-white"></p>
       </div>
 
-      <!-- Tarjeta 2 -->
+      <!-- Card 2 -->
       <div class="border-2 border-red-500 p-4 rounded-lg">
         <img src="../../images/guitar2.jpg" alt="Guitarra 2" class="rounded-lg w-full h-[200px] object-cover">
         <h3 class="mt-2 text-white font-bold text-2xl"></h3>
         <p class="mt-1 text-white"></p>
       </div>
 
-      <!-- Tarjeta 3 -->
+      <!-- Card 3 -->
       <div class="border-2 border-red-500 p-4 rounded-lg">
         <img src="../../images/guitar3.jpg" alt="Guitarra 3" class="rounded-lg w-full h-[200px] object-cover">
         <h3 class="mt-2 text-white font-bold text-2xl"></h3>
@@ -47,16 +47,16 @@
   <script type="module">
     import { loadLocales } from '../../js/load-locales.js';
 
-    // Cargar JSON en español
+    // Load Spanish translation
     const texts = await loadLocales('es');
 
-    // Actualizar título principal
+    // Update main title
     document.querySelector('h2').textContent = texts.guitars.ourGuitars;
 
-    // Seleccionar todas las tarjetas
+    // Select all cards
     const cards = document.querySelectorAll('div.grid > div');
 
-    // Actualizar cada tarjeta con los textos del JSON
+    // Update every card with the translations text
     cards[0].querySelector('h3').textContent = texts.guitars.list[0].title;
     cards[0].querySelector('p').textContent = texts.guitars.list[0].description;
 

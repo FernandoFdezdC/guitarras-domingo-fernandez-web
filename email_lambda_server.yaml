@@ -10,7 +10,7 @@ Parameters:
     Description: Password or email API key
   AllowedOrigins:
     Type: CommaDelimitedList
-    Default: "https://guitarrasdomingofernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
+    Default: "https://guitarras-domingo-fernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
     Description: Allowed domains for CORS
 
 Resources:

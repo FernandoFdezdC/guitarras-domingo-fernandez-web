@@ -32,7 +32,7 @@ textarea:-webkit-autofill:focus {
 }
 
 /* Popups: */
-/* Para el efecto de overlay */
+/* For the overlay effect */
 .fixed {
   position: fixed;
 }

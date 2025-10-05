@@ -13,7 +13,7 @@ Parameters:
 
   AcmCertificateArn:
     Type: String
-    Description: "ARN of the ACM certificate for guitarrasdomingofernandez.es (must be in us-east-1)"
+    Description: "ARN of the ACM certificate for guitarras-domingo-fernandez.es (must be in us-east-1)"
 
 Conditions:
   CreateLogBucket: !Not [!Equals [!Ref CloudFrontLogBucketParam, ""]]

@@ -1,4 +1,4 @@
-# guitarrasdomingofernandez-web
+# guitarras-domingo-fernandez-web
 
 This is a static webpage built with raw **HTML**, **JavaScript**, and **CSS** and deployed entirely on **AWS**.
 
@@ -22,7 +22,7 @@ New versions of this project can be deployed using `AWS CLI`. To deploy new vers
 
 In order to avoid network caching on the browser, activate option "Disable cache" in Network tab.
 
-To automate deployment, use `./scripts/deploy.sh "BUCKET_NAME" "DISTRIBUTION_ID"` (it works with `AWS CLI` version `aws-cli/2.28.21 Python/3.13.7 Windows/11 exe/AMD64`).
+To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME" "DISTRIBUTION_ID"` (it works with `AWS CLI` version `aws-cli/2.28.21 Python/3.13.7 Windows/11 exe/AMD64`).
 
 
 ## General information

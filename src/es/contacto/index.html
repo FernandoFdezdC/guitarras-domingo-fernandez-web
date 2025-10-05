@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contacto</title>
 
-  <!-- Tailwind + estilos -->
+  <!-- Tailwind + styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
@@ -16,7 +16,7 @@
   <script src="../../js/load-navbar.js"></script>
 
   <main class="container mx-auto">
-    <!-- Info de contacto -->
+    <!-- Contact information -->
     <div class="mt-8 flex flex-col items-start gap-4">
       <p class="text-2xl">
         <span id="contact-phone-label"></span> <span class="font-bold" id="contact-phone"></span>
@@ -26,7 +26,7 @@
       </p>
     </div>
 
-    <!-- Formulario -->
+    <!-- Form -->
     <div class="mt-12 mx-auto w-full max-w-xl bg-red-800 p-8 rounded">
       <h2 class="text-3xl font-bold mb-6 text-center" id="contact-title"></h2>
 
@@ -57,26 +57,26 @@
   <script type="module">
     import { loadLocales } from '../../js/load-locales.js';
 
-    // Cargar textos del JSON en español
+    // Load Spanish translation
     const texts = await loadLocales('es');
 
-    // Actualizar info de contacto
+    // Update contact information
     document.getElementById('contact-title').textContent = texts.contact.contact.title;
-    // Actualizar info de contacto desde JSON, con la etiqueta fuera del span
+    // Update contact information, with tag outside of span
     document.getElementById('contact-phone-label').textContent = texts.contact.contact.phone + ':';
     document.getElementById('contact-phone').textContent = texts.contact.contact.phoneNumber;
 
     document.getElementById('contact-address-label').textContent = texts.contact.contact.address + ':';
     document.getElementById('contact-address').textContent = texts.contact.contact.addressName;
 
-    // Actualizar placeholders
+    // Update placeholders
     document.getElementById('contact-name').placeholder = texts.contact.placeholders.name;
     document.getElementById('contact-email').placeholder = texts.contact.placeholders.email;
     document.getElementById('contact-subject').placeholder = texts.contact.placeholders.subject;
     document.getElementById('contact-message').placeholder = texts.contact.placeholders.message;
     document.getElementById('contact-send').textContent = texts.contact.buttons.send;
 
-    // Manejo del formulario
+    // Form handling
     const form = document.getElementById("contact-form");
     const status = document.getElementById("form-status");
 
@@ -88,7 +88,7 @@
       const subject = form.subject.value;
       const message = form.message.value;
 
-      // URL de tu Lambda (API Gateway)
+      // Lambda URL (API Gateway)
       const lambdaUrl = "https://q6oh44uilj.execute-api.eu-south-2.amazonaws.com/prod/contact";
 
       try {
@@ -102,7 +102,7 @@
             email,
             subject,
             message,
-            origin: window.location.origin // para CORS
+            origin: window.location.origin // CORS
           }),
         });
 
@@ -112,11 +112,11 @@
           status.innerHTML = `<span class='text-green-400 font-bold'>${texts.contact.contact.successMsg}</span>`;
           form.reset();
         } else {
-          status.innerHTML = `<span class='text-red-400 font-bold'>${data.message || "Error enviando el correo"}</span>`;
+          status.innerHTML = `<span class='text-red-400 font-bold'>${data.message || "Error sending email"}</span>`;
         }
       } catch (error) {
-        console.error("Error llamando Lambda:", error);
-        status.innerHTML = `<span class='text-red-400 font-bold'>Error de conexión con el servidor</span>`;
+        console.error("Error calling Lambda:", error);
+        status.innerHTML = `<span class='text-red-400 font-bold'>Server connection error</span>`;
       }
     });
   </script>

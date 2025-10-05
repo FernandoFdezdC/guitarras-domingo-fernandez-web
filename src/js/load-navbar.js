@@ -1,7 +1,7 @@
 // js/load-navbar.js
 async function loadNavbar() {
   try {
-    console.log('Cargando navbar...');
+    console.log('Loading navbar...');
 
     const response = await fetch('/components/navbar.html');
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -10,14 +10,14 @@ async function loadNavbar() {
     const tempContainer = document.createElement('div');
     tempContainer.innerHTML = html;
 
-    // --- 1) Añadir estilos (resolviendo rutas relativas respecto a response.url)
+    // --- 1) Add styles (resolving relative paths based on response.url)
     const styles = Array.from(tempContainer.querySelectorAll('style, link[rel="stylesheet"]'));
     styles.forEach(style => {
       if (style.tagName === 'LINK') {
         const href = style.getAttribute('href');
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        // resuelve rutas relativas contra la URL de la respuesta
+        // resolve relative paths based on response URL
         link.href = href ? new URL(href, response.url).href : '';
         document.head.appendChild(link);
       } else {
@@ -25,69 +25,69 @@ async function loadNavbar() {
       }
     });
 
-    // --- 2) Extraer scripts para recrearlos más tarde (y removemos los originales)
+    // --- 2) Extract scripts to recreate them later (and remove the originals)
     const scripts = Array.from(tempContainer.querySelectorAll('script'));
     scripts.forEach(s => s.parentNode && s.parentNode.removeChild(s));
 
-    // --- 3) Mover todos los nodos top-level preservando el orden
+    // --- 3) Move all top-level nodes while preserving their order
     const nodes = Array.from(tempContainer.childNodes);
-    // insertamos en orden correcto: iteramos de último a primero y los insertamos antes del primer hijo del body
+    // Insert in the correct order: iterate from last to first and insert before the body's first child
     for (let i = nodes.length - 1; i >= 0; i--) {
       document.body.insertBefore(nodes[i], document.body.firstChild);
     }
 
-    console.log('Navbar insertada en el DOM (todos los nodos).');
+    console.log('Navbar inserted in the DOM (all nodes).');
 
-    // --- 4) (Re)crear y ejecutar scripts en el orden original
+    // --- 4) (Re)create and execute scripts in their original order
     for (const script of scripts) {
       if (script.src) {
-        // script externo: crear nuevo <script src="..."> y esperar a load para preservar orden
+        // External script: create a new <script src="..."> and wait for load to preserve order
         const newScript = document.createElement('script');
         newScript.src = new URL(script.getAttribute('src'), response.url).href;
-        newScript.async = false; // mantener orden
+        newScript.async = false; // preserve order
         document.head.appendChild(newScript);
-        // esperar a que cargue para asegurar que funciones globales queden definidas
+        // Wait for it to load to ensure global functions are defined
         await new Promise((resolve, reject) => {
           newScript.onload = () => resolve();
           newScript.onerror = () => {
             console.warn('Error cargando script externo de navbar:', newScript.src);
-            resolve(); // no abortamos la carga total, solo continuamos
+            resolve(); // Do not abort the full load, just continue
           };
         });
       } else {
-        // script inline: crear un nuevo <script> con el texto y añadir al head -> esto ejecuta el código
+        // Inline script: create a new <script> with the code and append it to the head -> this executes the code
         const inline = document.createElement('script');
         inline.textContent = script.textContent;
         document.head.appendChild(inline);
       }
     }
 
-    // --- 5) Inicializar la navbar (si existe la función)
+    // --- 5) Initialize the navbar (if the function exists)
     if (typeof initNavbar === 'function') {
-      console.log('Inicializando navbar (initNavbar)...');
+      console.log('Initializing navbar (initNavbar)...');
       initNavbar();
     } else {
-      console.warn('initNavbar no está definida. Intentando inicializar manualmente.');
+      console.warn('initNavbar is not defined. Trying to manually initialize...');
       if (typeof initializeNavbarManually === 'function') {
         initializeNavbarManually();
       }
     }
 
-    console.log('Navbar cargada exitosamente');
+    console.log('Navbar successfully loaded');
   } catch (error) {
     console.error('Error loading navbar:', error);
     createFallbackNavbar();
   }
 }
 
-// Función de inicialización manual si initNavbar no está disponible
+// Manual initialization function if initNavbar is not available
 function initializeNavbarManually() {
-    console.log('Inicializando navbar manualmente...');
+    console.log('Manually initializing navbar...');
     
-    // Aquí puedes agregar código de inicialización básico si es necesario
-    // Por ejemplo, agregar event listeners básicos
+    // Here we can add basic initialization code if needed,
+    // for example, add basic event listeners
     
-    // Botón de menú móvil
+    // Mobile menu button
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     
@@ -97,7 +97,7 @@ function initializeNavbarManually() {
         });
     }
     
-    // Selector de idioma
+    // Language selector
     const langTrigger = document.getElementById('lang-trigger');
     const langDropdown = document.getElementById('lang-dropdown');
     
@@ -107,7 +107,7 @@ function initializeNavbarManually() {
             langDropdown.classList.toggle('hidden');
         });
         
-        // Cerrar al hacer clic fuera
+        // Close when clicking outside of the dropdown
         document.addEventListener('click', () => {
             langDropdown.classList.add('hidden');
         });
@@ -132,12 +132,12 @@ function createFallbackNavbar() {
     document.body.insertBefore(container, document.body.firstChild);
 }
 
-// Iniciar la carga cuando el DOM esté listo
+// Initialize loading when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadNavbar);
 } else {
     loadNavbar();
 }
 
-// Hacer la función loadNavbar disponible globalmente por si se necesita
+// Make the loadNavbar function globally available in case it's needed
 window.loadNavbar = loadNavbar;

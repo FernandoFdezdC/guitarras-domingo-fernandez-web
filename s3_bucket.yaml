@@ -23,6 +23,7 @@ Resources:
           - ObjectOwnership: BucketOwnerEnforced
       WebsiteConfiguration:
         IndexDocument: index.html
+        ErrorDocument: error.html
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -31,11 +32,14 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          # Allow public read for website objects
           - Sid: PublicReadForWebsite
             Effect: Allow
             Principal: "*"
             Action: "s3:GetObject"
             Resource: !Sub "arn:aws:s3:::${BucketNameParam}/*"
+
+          # Deny modifications to everyone except bucket owner
           - Sid: DenyAllPublicModifications
             Effect: Deny
             NotPrincipal:
@@ -43,7 +47,13 @@ Resources:
             Action:
               - "s3:DeleteObject"
               - "s3:DeleteObjectVersion"
+            Resource: !Sub "arn:aws:s3:::${BucketNameParam}/*"
+
+          # Deny lifecycle changes to everyone except bucket owner (bucket-level action)
+          - Sid: DenyAllPublicLifecycle
+            Effect: Deny
+            NotPrincipal:
+              AWS: "arn:aws:iam::800425446766:root"
+            Action:
               - "s3:PutLifecycleConfiguration"
-            Resource: 
-              - "arn:aws:s3:::${BucketNameParam}"
-              - "arn:aws:s3:::${BucketNameParam}/*"
+            Resource: !Sub "arn:aws:s3:::${BucketNameParam}"
