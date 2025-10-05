@@ -28,21 +28,28 @@ export default function Contact() {
     setSuccess(false);
     setError("");
 
+    const lambdaUrl = "https://1ysqxqs6lb.execute-api.eu-south-2.amazonaws.com/prod/contact";
+
     try {
-      const response = await fetch("/api/send-email", {
+      const response = await fetch(lambdaUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          origin: window.location.origin, // for CORS or logging if needed
+        }),
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setSuccess(true);
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setError(t.errorMsg);
+        setError(data.message || t.errorMsg);
       }
     } catch (err) {
-      setError(err.message || "Error de conexión. Inténtalo de nuevo.");
+      setError(err.message || "Connection error. Try it again.");
     }
 
     setLoading(false);
@@ -106,7 +113,7 @@ export default function Contact() {
             {loading ? t.buttons.sending : <strong>{t.buttons.send}</strong>}
           </button>
         </form>
-        {success && <p className="text-green-400 mt-4 text-center"><strong>{t.successMsg}</strong></p>}
+        {success && <p className="text-green-400 mt-4 text-center"><strong>{t.contact.successMsg}</strong></p>}
         {error && <p className="text-red-400 mt-4 text-center"><strong>{error}</strong></p>}
       </div>
     </>
