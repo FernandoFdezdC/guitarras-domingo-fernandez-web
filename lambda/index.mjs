@@ -22,7 +22,8 @@ export const handler = async (event) => {
     const { name, email, subject, message, origin } = data;
 
     // --- CORS validation
-    if (!origin || !allowedOrigins.includes(origin)) {
+    const normalizeOrigin = (url) => url.replace(/\/+$/, ""); // quita barras al final
+    if (!origin || !allowedOrigins.some(o => normalizeOrigin(o) === normalizeOrigin(origin))) {
       return { statusCode: 403, body: JSON.stringify({ message: "Not allowed by CORS" }) };
     }
 

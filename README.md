@@ -31,18 +31,14 @@ In order to update the lambda function's code, we must upload a .zip file into A
 
 ## General information
 
-`src` folder contains all the static files that are used to create the static site, while `lambda` folder contains the script executed by the `AWS` Lambda function. `lambda/lambda_test.json` contains a call to test the lambda function behaviour. `src/index.html` is the entrypoint of the website.
+`src` folder contains all the static files that are used to create the static site, while `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
 
 `src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
 
 `src/locales` folder contains the translations to 2 languages (Spanish and English).
 
-`lambda/lambda_test.json` is the file to be used when testing the Lambda in the lambda dashboard, like this:
 
-![alt text](image.png)
-
-
-## Troubleshooting CloudFront distribution `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` error
+## Troubleshooting `CloudFront` distribution `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` error
 
 Sometimes, CloudFront distribution can fail to load the SSL certificate. It can be troubleshooted using:
 
@@ -56,3 +52,12 @@ openssl s_client -connect guitarras-domingo-fernandez.es:443 -servername guitarr
 ```
 
 Then, the problem may be solved ensuring that the domain is in the `Alternate Domain Name` field in the CloudFront distribution.
+
+
+## Troubleshooting email errors
+
+Email error can be produced on the side of the `lambda` or on the side of the `API Gateway`. `lambda/lambda_test.json` contains a call to test the lambda function behaviour in the Lambda dashboard, like this:
+
+![alt text](image.png)
+
+`lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with the correct .
