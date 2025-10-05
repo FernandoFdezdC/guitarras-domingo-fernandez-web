@@ -1,15 +1,15 @@
 // app/[lang]/layout.tsx
 import type { Metadata } from "next";
 import Navbar from "../components/navbar"; // shared component
+import { ReactNode } from "react";
 
-// We can generate metadata dynamically based on the lang param.
+// Dynamically generate metadata based on the lang parameter
 export async function generateMetadata({
   params,
 }: {
-  params: { lang?: string }; // Make lang optional to handle undefined cases
+  params?: { lang?: string };
 }): Promise<Metadata> {
-  // Ensure params is awaited properly
-  const lang = params?.lang ?? "es"; // Default to "es" if lang is undefined
+  const lang = params?.lang ?? "es"; // Default to "es" if undefined
 
   return {
     title: lang === "en" ? "Domingo Fernández Guitars" : "Guitarras Domingo Fernández",
@@ -20,13 +20,18 @@ export async function generateMetadata({
   };
 }
 
-export default function LangLayout({
+// Dynamic layout compatible with Next.js 15
+export default async function LangLayout({
   children,
+  params,
 }: {
-  children: React.ReactNode;
-  params: { lang: string };
+  children: ReactNode;
+  params?: Promise<{ lang?: string }>; // params as an optional promise
 }) {
-  // We can use params.lang to set the <html lang> attribute, etc.
+  const resolvedParams = params ? await params : {};
+  const lang = resolvedParams?.lang ?? "es"; // Default to "es" if missing
+  console.log("language:", lang)
+
   return (
     <div className="bg-black text-white min-h-screen p-8 sm:p-20">
       <Navbar />
