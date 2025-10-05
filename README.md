@@ -1,6 +1,16 @@
 # guitarras-domingo-fernandez-web
 
-On this branch, the project is made using Next.js framework.
+### Simple website programmed using different technologies
+
+- On this branch, `master`, the project is made using Javascript `Next.js` framework.
+
+- On the `develop-static-site` branch, the same project is executed but as a static page using Javascript Vanilla and deploying it using `AWS` `S3`, `CloudFront`, `AWS` `Lambda` and `API Gateway` for the email sending functionality. The infrastructure provisioning is automated using `CloudFormation`.
+
+- Finally, on the `develop-static-site-react` branch, the same project is executed but as a static page using React and deploying it using `AWS` `S3`, `CloudFront`, `AWS` `Lambda`  and `API Gateway` for the email sending functionality. The infrastructure provisioning is also automated using `CloudFormation`.
+
+`API Gateway` ensures the scalability of the API requests, being able to adapt to varying workloads.
+
+## About this branch
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -105,8 +115,3 @@ To change your GitHub credentials and verify:
 git remote set-url origin https://ghp_J4Npl...@github.com/FernandoFdezdC/guitarras-domingo-fernandez-web.git
 git remote -v
 ```
-
-
-### Additional information
-
-On the `develop-static-site` branch, the same project is executed but as a static page using Javascript Vanilla and deploying it using `AWS` `S3`, `CloudFront` and `AWS` `Lambda`. The infrastructure provisioning is automated using `CloudFormation`.
