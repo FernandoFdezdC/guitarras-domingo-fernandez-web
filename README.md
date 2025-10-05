@@ -18,7 +18,7 @@ These three steps are fully automated using **CloudFormation** via the files `s3
 
 ## Continuous integration
 
-New versions of this project can be deployed using `AWS CLI`. To deploy new versions into `AWS`, use `aws s3 sync src s3://guitarras-domingo-fernandez`.
+New versions of this project can be deployed using `AWS CLI`. To deploy new versions into `AWS`, use `aws s3 sync build s3://guitarras-domingo-fernandez`.
 
 In order to avoid network caching on the browser, activate option "Disable cache" in Network tab.
 
@@ -26,7 +26,7 @@ To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME"
 
 Note that the lambda function from the `email_lambda_server.yaml` file is not created with correct code. The correct code must be updated afterwards.
 
-In order to update the lambda function's code, we must upload a .zip file into AWS with the following content: `index.mjs`, `package.json`, `package-lock.json` (these 3 files can be found in `/lambda` folder) and `node_modules` installed (to obtain that, just execute `npm install --ignore-scripts` inside the `lambda` folder). Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
+In order to update the lambda function's code, we must upload a .zip file into AWS with the following content: `index.mjs`, `package.json`, `package-lock.json` (these 3 files can be found in `/lambda` folder) and `node_modules` installed (to obtain that, just execute `npm install --ignore-scripts` inside the `lambda` folder). Finally, set up the environment variables in lambda `Configuration > Environment Variables`.
 
 
 ## General information
@@ -45,7 +45,7 @@ npm start
 npm run build
 ```
 
-Then, the .
+Then, synchronize the static files generated in `/build` folder with `AWS` bucket using `aws s3 sync build s3://guitarras-domingo-fernandez`.
 
 The `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
 
