@@ -26,15 +26,22 @@ export default function Navbar() {
     if (initialized.current) return;
     initialized.current = true;
 
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("preferred_language="));
-
-    if (cookie) {
-      const langFromCookie = cookie.split("=")[1];
-      if (langFromCookie === "es" || langFromCookie === "en") {
-        setCurrentLang(langFromCookie);
-        document.documentElement.lang = langFromCookie;
+    // Check URL first
+    const pathLang = location.pathname.split("/")[1];
+    if (pathLang === "es" || pathLang === "en") {
+      setCurrentLang(pathLang);
+      document.documentElement.lang = pathLang;
+    } else {
+      // Fallback to cookie
+      const cookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("preferred_language="));
+      if (cookie) {
+        const langFromCookie = cookie.split("=")[1];
+        if (langFromCookie === "es" || langFromCookie === "en") {
+          setCurrentLang(langFromCookie);
+          document.documentElement.lang = langFromCookie;
+        }
       }
     }
   }, []);

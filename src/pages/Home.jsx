@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom'; // React Router
 import { useLocaleDictionary } from "../lib/useLocaleDictionary";
 
 const slidesData = [
@@ -8,8 +9,9 @@ const slidesData = [
   { text: "", image: "/guitar3.jpg" },
 ];
 
-export default function Home({ lang = "es" }) {
-  const t = useLocaleDictionary(lang).home; // fallback
+export default function Home({ }) {
+  const { lang } = useParams();
+  const t = useLocaleDictionary(lang || 'es').home; // fallback
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState(slidesData);
