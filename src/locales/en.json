@@ -4,7 +4,6 @@
       "title": "Send us a message",
       "phone": "Phone (mobile)",
       "address": "Address",
-      "phoneNumber": "+34 649 805 899",
       "addressName": "General Moscardó Street, No. 16, Navahermosa (Toledo), Spain.",
       "successMsg": "Message sent successfully!",
       "errorMsg": "There was a problem sending the email."
@@ -20,26 +19,23 @@
       "message": "Your message"
     }
   },
-  "guitars": {
-    "ourGuitars": "Our Guitars",
-    "list": [
-      {
-        "id": "guitar1",
-        "title": "guitar1",
-        "description": "Guitar 1 description."
-      },
-      {
-        "id": "guitar2",
-        "title": "guitar2",
-        "description": "Guitar 2 description."
-      },
-      {
-        "id": "guitar3",
-        "title": "guitar3",
-        "description": "Guitar 3 description."
-      }
-    ]
-  },
+  "guitars": [
+    {
+      "id": "guitar1",
+      "title": "guitar1",
+      "description": "Guitar 1 description."
+    },
+    {
+      "id": "guitar2",
+      "title": "guitar2",
+      "description": "Guitar 2 description."
+    },
+    {
+      "id": "guitar3",
+      "title": "guitar3",
+      "description": "Guitar 3 description."
+    }
+  ],
   "home": {
     "guitarDescription1": "Handcrafted guitars made from the finest wood",
     "guitarDescription2": "The perfect sound for the most demanding musicians.",

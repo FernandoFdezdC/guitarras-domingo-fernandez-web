@@ -1,6 +1,6 @@
 # guitarras-domingo-fernandez-web
 
-This is a static webpage built with raw **HTML**, **JavaScript**, and **CSS** and deployed entirely on **AWS**.
+This is a static webpage built with **React** and deployed entirely on **AWS**.
 
 ## Infrastructure provisioning.
 
@@ -10,7 +10,7 @@ This project can be both deployed in `aws` both using manual steps (ClickOps) or
 
 1. Create a `CloudFront` distribution and add a `custom SSL certificate` to the `CloudFront` distribution (for example, an ACM certificate). Note that in `route 53` the assignation to the `CloudFront` distribution is also necessary: assign the record name with the `CloudFront` Distribution domain name (example: `d3ccausbv8iue6.cloudfront.net`) through Alias type (A type + Alias activated). It is also important that the `CloudFront` distribution has the `S3` website endpoint as origin and not the bucket itself.
 
-2. Creaste a lambda function with node.js environment.
+2. Create a lambda function with node.js environment.
 
 3. Lastly, create a type `HTTP` `API Gateway` with a POST endpoint `/contact` that consumes the email information and passes it onto the Lambda function. It is important to take into account that the Lambda service is, by default, asynchronous (i.e., while the message is being sent we can execute other tasks).
 
@@ -31,7 +31,23 @@ In order to update the lambda function's code, we must upload a .zip file into A
 
 ## General information
 
-`src` folder contains all the static files that are used to create the static site, while `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
+This app was created using:
+
+```bash
+npx create-react-app my-app
+cd my-app
+npm start
+```
+
+`src` folder contains the application. The static files can be obtained executing
+
+```bash
+npm run build
+```
+
+Then, the .
+
+The `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
 
 `src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
 
@@ -60,4 +76,4 @@ Email error can be produced on the side of the `lambda` or on the side of the `A
 
 ![alt text](image.png)
 
-`lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with the correct .
+`lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with correct parameters.

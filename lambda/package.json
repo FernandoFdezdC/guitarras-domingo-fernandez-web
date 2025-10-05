@@ -1,0 +1,26 @@
+{
+  "name": "guitarras-domingo-fernandez-web",
+  "version": "1.0.0",
+  "description": "guitarras domingo fernandez web",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FernandoFdezdC/guitarras-domingo-fernandez-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FernandoFdezdC/guitarras-domingo-fernandez-web/issues"
+  },
+  "homepage": "https://github.com/FernandoFdezdC/guitarras-domingo-fernandez-web#readme",
+  "dependencies": {
+    "nodemailer": "^7.0.6"
+  }
+}
