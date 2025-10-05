@@ -4,7 +4,7 @@ Description: CloudFront distribution with optional logging and ACM certificate
 Parameters:
   WebsiteEndpoint:
     Type: String
-    Description: "S3 website endpoint (e.g., my-bucket.s3-website-us-east-1.amazonaws.com)"
+    Description: "S3 website endpoint (<BUCKET_NAME>.s3-website.<BUCKET_REGION>.amazonaws.com)"
 
   CloudFrontLogBucketParam:
     Type: String
@@ -13,7 +13,7 @@ Parameters:
 
   AcmCertificateArn:
     Type: String
-    Description: "ARN of the ACM certificate for guitarras-domingo-fernandez.es (must be in us-east-1)"
+    Description: "ARN of the ACM certificate for guitarras-domingo-fernandez.es (the ACM certificate must always be in us-east-1, independent of the S3 bucket placement)"
 
 Conditions:
   CreateLogBucket: !Not [!Equals [!Ref CloudFrontLogBucketParam, ""]]
@@ -34,6 +34,9 @@ Resources:
     Properties:
       DistributionConfig:
         Enabled: true
+        Aliases:
+          - guitarras-domingo-fernandez.es
+          - www.guitarras-domingo-fernandez.es
         Origins:
           - Id: WebsiteOrigin
             DomainName: !Ref WebsiteEndpoint
@@ -73,3 +76,9 @@ Outputs:
     Value: !Ref CloudFrontDistribution
     Export:
       Name: CloudFrontDistributionId
+
+  CloudFrontDomainName:
+    Description: "The domain name of the CloudFront distribution"
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: CloudFrontDomainName

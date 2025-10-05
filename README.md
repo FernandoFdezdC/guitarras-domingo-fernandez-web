@@ -32,3 +32,18 @@ To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME"
 `src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
 
 `src/locales` folder contains the translations to 2 languages (Spanish and English).
+
+## Troubleshooting CloudFront distribution `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` error
+
+Sometimes, CloudFront distribution can fail to load the SSL certificate. It can be troubleshooted using:
+
+```bash
+# Generic test
+openssl s_client -connect guitarras-domingo-fernandez.es:443 -servername guitarras-domingo-fernandez.es
+# Force TLS 1.2
+openssl s_client -connect guitarras-domingo-fernandez.es:443 -servername guitarras-domingo-fernandez.es -tls1_2
+# Force TLS 1.3
+openssl s_client -connect guitarras-domingo-fernandez.es:443 -servername guitarras-domingo-fernandez.es -tls1_3
+```
+
+Then, the problem may be solved ensuring that the domain is in the `Alternate Domain Name` field in the CloudFront distribution.
