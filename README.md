@@ -60,4 +60,4 @@ Email error can be produced on the side of the `lambda` or on the side of the `A
 
 ![alt text](image.png)
 
-`lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with the correct .
+`lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with correct parameters.
