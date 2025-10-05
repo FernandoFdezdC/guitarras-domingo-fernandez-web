@@ -7,15 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/globals.css">
     <script>
-        // Only redirect if it's NOT navbar.html
+        // Only redirect if we are on the homepage
         const path = window.location.pathname;
         if (path === '/' || path === '/index.html') {
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('es')) {
-                window.location.href = '/es/';
-            } else {
-                window.location.href = '/en/';
+            // Function to read cookies
+            const getCookie = (name) => {
+                const value = document.cookie.split(';').find(c => c.trim().startsWith(name + '='));
+                return value ? decodeURIComponent(value.split('=')[1]) : null;
+            };
+
+            let redirectLang = getCookie('preferred_language');
+
+            if (!redirectLang) {
+                // Try to get language from URL path (first segment)
+                const firstSegment = path.split('/').filter(Boolean)[0];
+                if (firstSegment) {
+                    redirectLang = firstSegment.trim().replace(/\/+$/, '');
+                }
             }
+
+            if (!redirectLang) {
+                // Fallback: detect browser language
+                const userLang = navigator.language || navigator.userLanguage;
+                redirectLang = userLang.startsWith('es') ? 'es' : 'en';
+            }
+
+            // Final redirect
+            window.location.href = '/' + redirectLang + '/';
         }
     </script>
 </head>
