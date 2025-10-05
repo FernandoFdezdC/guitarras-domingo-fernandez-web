@@ -46,3 +46,5 @@ logos/*
 
 *.zip
 *.mp4
+
+/dist
