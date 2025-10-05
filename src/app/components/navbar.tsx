@@ -56,7 +56,7 @@ export default function Navbar() {
 
     // Redirigir al nuevo path
     router.push(newPath);
-  }, [currentLang]);
+  }, [currentLang, router]);
 
   const langTriggerRef = useRef<HTMLButtonElement>(null);
   const langPopupRef = useRef<HTMLDivElement>(null);

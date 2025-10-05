@@ -9,7 +9,7 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 60 segundos
 const MAX_REQUESTS = 5; // máximo de peticiones por ventana
 
 // Dominios permitidos en CORS
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
 // Función para verificar reCAPTCHA (ajusta según la versión que utilices)
 // async function verifyRecaptcha(token: string): Promise<boolean> {
@@ -60,6 +60,7 @@ export async function POST(req: Request) {
 
   // Obtener datos del body (incluyendo el token de reCAPTCHA)
   const { name, email, subject, message, recaptchaToken } = await req.json();
+  console.log("recaptchaToken:", recaptchaToken)
 
   // Verificar reCAPTCHA
   // const isHuman = await verifyRecaptcha(recaptchaToken);
