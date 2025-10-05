@@ -51,20 +51,20 @@ It will be necessary to install PM2 and the production dependencies:
 ```bash
 sudo npm install pm2 -g
 
-cd /ruta_absoluta/bi-frontend
+cd /ruta_absoluta/guitarras-domingo-fernandez-web
 npm run build
-pm2 start npm  --name “bi-frontend” -- start -- --port=3001 #Inicializa hilo con pm2 escuchando al puerto 3001
-pm2 save # guarda la configuración actual en disco
-pm2 startup # Analiza sistema para habilitar pm2 como daemon
-#En el caso de Ubuntu con systemctl pide ejecutar lo siguiente
+pm2 start npm  --name "guitarras-domingo-fernandez-web" -- start -- --port=3001 # Starts a process with pm2 listening on port 3001
+pm2 save # Saves the current configuration to disk
+pm2 startup # Analyzes the system to enable pm2 as a daemon
+# In the case of Ubuntu with systemctl, it asks to run the following
 sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
 ```
 
 To run the service in **production mode** using Docker, execute:
 
 ```bash
-docker build --no-cache -t bi-frontend-image .
-docker run -d --name bi-frontend-container -p 3000:3000 bi-frontend-image
+docker build --no-cache -t guitarras-domingo-fernandez-web-image .
+docker run -d --name guitarras-domingo-fernandez-web-container -p 3000:3000 guitarras-domingo-fernandez-web-image
 ```
 
 
