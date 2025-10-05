@@ -10,7 +10,7 @@ This project can be both deployed in `aws` both using manual steps (ClickOps) or
 
 1. Create a `CloudFront` distribution and add a `custom SSL certificate` to the `CloudFront` distribution (for example, an ACM certificate). Note that in `route 53` the assignation to the `CloudFront` distribution is also necessary: assign the record name with the `CloudFront` Distribution domain name (example: `d3ccausbv8iue6.cloudfront.net`) through Alias type (A type + Alias activated). It is also important that the `CloudFront` distribution has the `S3` website endpoint as origin and not the bucket itself.
 
-2. In order to create the lambda function, we must upload a .zip file into AWS with the following content: `index.mjs` (which can be found in `/lambda/index.mjs`), `package.json`, `package-lock.json` and `node_modules` installed. Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
+2. Creaste a lambda function with node.js environment.
 
 3. Lastly, create a type `HTTP` `API Gateway` with a POST endpoint `/contact` that consumes the email information and passes it onto the Lambda function. It is important to take into account that the Lambda service is, by default, asynchronous (i.e., while the message is being sent we can execute other tasks).
 
@@ -24,6 +24,10 @@ In order to avoid network caching on the browser, activate option "Disable cache
 
 To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME" "DISTRIBUTION_ID"` (it works with `AWS CLI` version `aws-cli/2.28.21 Python/3.13.7 Windows/11 exe/AMD64`).
 
+Note that the lambda function from the `email_lambda_server.yaml` file is not created with correct code. The correct code must be updated afterwards.
+
+In order to update the lambda function's code, we must upload a .zip file into AWS with the following content: `index.mjs` (which can be found in `/lambda/index.mjs`), `package.json`, `package-lock.json` and `node_modules` installed (to obtain that, just execute `npm install --ignore-scripts` in this project's root folder). Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
+
 
 ## General information
 
@@ -32,6 +36,11 @@ To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME"
 `src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
 
 `src/locales` folder contains the translations to 2 languages (Spanish and English).
+
+`lambda/lambda_test.json` is the file to be used when testing the Lambda in the lambda dashboard, like this:
+
+![alt text](image.png)
+
 
 ## Troubleshooting CloudFront distribution `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` error
 

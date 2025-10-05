@@ -10,7 +10,7 @@ Parameters:
     Description: Password or email API key
   AllowedOrigins:
     Type: CommaDelimitedList
-    Default: "https://guitarras-domingo-fernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
+    Default: "https://guitarras-domingo-fernandez.es,https://www.guitarras-domingo-fernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
     Description: Allowed domains for CORS
 
 Resources:
@@ -36,7 +36,8 @@ Resources:
       Role: !GetAtt EmailLambdaRole.Arn
       Code:
         ZipFile: |
-          import nodemailer from "nodemailer";
+          const AWS = require("aws-sdk");
+          const ses = new AWS.SES();
 
           // In-memory map for rate limiting
           const rateLimitMap = new Map();
@@ -47,7 +48,7 @@ Resources:
 
           const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
-          export const handler = async (event) => {
+          exports.handler = async (event) => {
             try {
               // --- Normalize body
               let data;
@@ -86,23 +87,18 @@ Resources:
                 return { statusCode: 400, body: JSON.stringify({ message: "Faltan campos obligatorios" }) };
               }
 
-              // --- Nodemailer configuration
-              const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                  user: process.env.EMAIL_USER,
-                  pass: process.env.EMAIL_PASS,
-                },
-              });
-
-              // --- Send email
-              await transporter.sendMail({
-                from: `"${name}" <${email}>`,
-                to: "ferfdezdelcerro@outlook.com",
-                subject,
-                text: message,
-                html: `<p><strong>De:</strong> ${name} (${email})</p><p>${message}</p>`,
-              });
+              // --- Send email using SES
+              await ses.sendEmail({
+                Source: process.env.EMAIL_USER, 
+                Destination: { ToAddresses: ["ferfdezdelcerro@outlook.com"] },
+                Message: {
+                  Subject: { Data: subject },
+                  Body: {
+                    Text: { Data: `De: ${name} (${email})\n\n${message}` },
+                    Html: { Data: `<p><strong>De:</strong> ${name} (${email})</p><p>${message}</p>` }
+                  }
+                }
+              }).promise();
 
               return { statusCode: 200, body: JSON.stringify({ message: "Email sent" }) };
             } catch (error) {
