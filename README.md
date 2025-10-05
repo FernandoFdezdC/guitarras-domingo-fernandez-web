@@ -26,7 +26,7 @@ To automate deployment with `CloudFront`, use `./scripts/deploy.sh "BUCKET_NAME"
 
 Note that the lambda function from the `email_lambda_server.yaml` file is not created with correct code. The correct code must be updated afterwards.
 
-In order to update the lambda function's code, we must upload a .zip file into AWS with the following content: `index.mjs` (which can be found in `/lambda/index.mjs`), `package.json`, `package-lock.json` and `node_modules` installed (to obtain that, just execute `npm install --ignore-scripts` in this project's root folder). Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
+In order to update the lambda function's code, we must upload a .zip file into AWS with the following content: `index.mjs`, `package.json`, `package-lock.json` (these 3 files can be found in `/lambda` folder) and `node_modules` installed (to obtain that, just execute `npm install --ignore-scripts` inside the `lambda` folder). Finally, set up the environment variables in lambda Configuration > Environment Variables (example environment variables can be found in `.env.example`).
 
 
 ## General information

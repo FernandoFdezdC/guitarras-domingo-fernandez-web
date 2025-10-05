@@ -1,12 +1,10 @@
-// app/[lang]/contacto/page.tsx
-"use client";
-
-import { useParams } from 'next/navigation';
+// src/pages/contact/Contact.jsx
+import { useParams } from 'react-router-dom'; // React Router
 import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
 import { useState } from 'react';
 
 export default function Contact() {
-  // Recuperamos el lang dinámico
+  // Recuperamos el lang dinámico de la URL
   const { lang } = useParams();
   const t = useLocaleDictionary(lang || 'es').contact; // fallback
 
@@ -20,11 +18,11 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
@@ -41,14 +39,10 @@ export default function Contact() {
         setSuccess(true);
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setError(t.contact.errorMsg);
+        setError(t.errorMsg);
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || "Error de conexión. Inténtalo de nuevo.");
-      } else {
-        setError("Error de conexión. Inténtalo de nuevo.");
-      }
+    } catch (err) {
+      setError(err.message || "Error de conexión. Inténtalo de nuevo.");
     }
 
     setLoading(false);
@@ -58,18 +52,15 @@ export default function Contact() {
     <>
       <div className="mt-8 flex flex-col items-start gap-4">
         <p className="text-2xl">
-          {t.contact.phone}: <span className="font-bold">+34 649 805 899</span>
+          {t.phone}: <span className="font-bold">+34 649 805 899</span>
         </p>
         <p className="text-2xl">
-          {t.contact.address}: <span className="font-bold">
-            {t.contact.addressName}
-          </span>
+          {t.address}: <span className="font-bold">{t.addressName}</span>
         </p>
       </div>
 
-      {/* Contenedor del formulario centrado */}
       <div className="mt-12 mx-auto w-full max-w-xl bg-red-800 p-8 rounded">
-        <h2 className="text-3xl font-bold mb-6 text-center">{t.contact.title}</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">{t.title}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -78,7 +69,6 @@ export default function Contact() {
             required
             value={formData.name}
             onChange={handleChange}
-            // className="w-full p-3 bg-red-900 text-white border border-red-700 rounded"
             className="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500"
           />
           <input
@@ -116,7 +106,7 @@ export default function Contact() {
             {loading ? t.buttons.sending : <strong>{t.buttons.send}</strong>}
           </button>
         </form>
-        {success && <p className="text-green-400 mt-4 text-center"><strong>{t.contact.successMsg}</strong></p>}
+        {success && <p className="text-green-400 mt-4 text-center"><strong>{t.successMsg}</strong></p>}
         {error && <p className="text-red-400 mt-4 text-center"><strong>{error}</strong></p>}
       </div>
     </>

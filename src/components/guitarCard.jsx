@@ -1,15 +1,8 @@
-import Image from "next/image";
-
-interface GuitarCardProps {
-  image: string;
-  title: string;
-  description: string;
-}
-
-export default function GuitarCard({ image, title, description }: GuitarCardProps) {
+// src/components/GuitarCard.jsx
+export default function GuitarCard({ image, title, description }) {
   return (
     <div className="border-2 border-red-500 p-4 rounded-lg">
-      <Image
+      <img
         src={image}
         alt={title}
         width={300}

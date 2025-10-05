@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Then, `npm install -D tailwindcss postcss autoprefixer` was executed to install Tailwind in this project.
+
 ## Available Scripts
 
 In the project directory, you can run:

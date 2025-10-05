@@ -1,19 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaGlobe } from "react-icons/fa";
-import LanguageMobilePopup from "../components/languageMobilePopup";
+import LanguageMobilePopup from "./languageMobilePopup";
 import { useLocaleDictionary } from "../lib/useLocaleDictionary";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [currentLang, setCurrentLang] = useState<"es" | "en">("es");
+  const [currentLang, setCurrentLang] = useState("es");
   const [langPopupOpen, setLangPopupOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const initialized = useRef(false);
 
-  const langTriggerRef = useRef<HTMLButtonElement>(null);
-  const langPopupRef = useRef<HTMLDivElement>(null);
+  const langTriggerRef = useRef(null);
+  const langPopupRef = useRef(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export default function Navbar() {
   }, []);
 
   // Handle language change
-  const changeLanguage = (lang: "es" | "en") => {
+  const changeLanguage = (lang) => {
     document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict; Secure`;
     document.documentElement.lang = lang;
     setCurrentLang(lang);
@@ -51,12 +51,12 @@ export default function Navbar() {
 
   // Close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event) => {
       if (
         langTriggerRef.current &&
-        !langTriggerRef.current.contains(event.target as Node) &&
+        !langTriggerRef.current.contains(event.target) &&
         langPopupRef.current &&
-        !langPopupRef.current.contains(event.target as Node)
+        !langPopupRef.current.contains(event.target)
       ) {
         setLangDropdownOpen(false);
       }

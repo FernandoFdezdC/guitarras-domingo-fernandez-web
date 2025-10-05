@@ -1,14 +1,9 @@
-interface LanguagePopupProps {
-  currentLanguage: "es" | "en";
-  setLanguagePopupOpen: (languagePopupOpen: true | false ) => void;
-  handleLanguageChange: (language: "es" | "en") => void;
-}
-
+// src/components/languageMobilePopup.jsx
 export default function LanguageMobilePopup({ 
   currentLanguage,
   setLanguagePopupOpen,
   handleLanguageChange
-}: LanguagePopupProps) {
+}) {
 
   return (
     <div
@@ -23,8 +18,8 @@ export default function LanguageMobilePopup({
         <button
           type="button"
           onClick={() => {
-            handleLanguageChange("es"); // Espera a que termine
-            setLanguagePopupOpen(false);    // Luego cierra
+            handleLanguageChange("es");
+            setLanguagePopupOpen(false);
           }}
           className={`w-full text-left py-3 px-4 rounded-md transition-colors ${
             currentLanguage === 'es' 
@@ -38,8 +33,8 @@ export default function LanguageMobilePopup({
         <button
           type="button"
           onClick={() => {
-            handleLanguageChange("en"); // Espera a que termine
-            setLanguagePopupOpen(false);    // Luego cierra
+            handleLanguageChange("en");
+            setLanguagePopupOpen(false);
           }}
           className={`w-full text-left py-3 px-4 rounded-md transition-colors ${
             currentLanguage === 'en' 

@@ -1,13 +1,10 @@
-// app/[lang]/guitarras/page.tsx
-"use client";
-
-import { useParams } from 'next/navigation';
-import { useLocaleDictionary } from '@/app/lib/useLocaleDictionary';
-import GuitarCard from "@/app/components/guitarCard";
+// src/pages/guitars/Guitars.jsx
+import { useParams } from 'react-router-dom'; // React Router
+import { useLocaleDictionary } from '../../lib/useLocaleDictionary';
+import GuitarCard from '../../components/guitarCard';
 
 export default function Guitars() {
-  // Recuperamos el lang dinámico
-  const { lang } = useParams() as { lang?: string };
+  const { lang } = useParams();
   const t = useLocaleDictionary(lang || 'es').guitars; // fallback
 
   return (
