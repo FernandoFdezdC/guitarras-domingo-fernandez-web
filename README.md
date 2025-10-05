@@ -1,6 +1,64 @@
-# guitarras-domingo-fernandez website
+# guitarras-domingo-fernandez-web
 
-On this branch, the project is made using the Next.js framework.
+On this branch, the project is made using Next.js framework.
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Production Deployment
+
+To put the application into production, it must be configured with **PM2** and a web server such as **Nginx** or **Apache**.  
+It will be necessary to install PM2 and the production dependencies:
+
+```bash
+sudo npm install pm2 -g
+
+cd /ruta_absoluta/bi-frontend
+npm run build
+pm2 start npm  --name “bi-frontend” -- start -- --port=3001 #Inicializa hilo con pm2 escuchando al puerto 3001
+pm2 save # guarda la configuración actual en disco
+pm2 startup # Analiza sistema para habilitar pm2 como daemon
+#En el caso de Ubuntu con systemctl pide ejecutar lo siguiente
+sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+```
+
+To run the service in **production mode** using Docker, execute:
+
+```bash
+docker build --no-cache -t bi-frontend-image .
+docker run -d --name bi-frontend-container -p 3000:3000 bi-frontend-image
+```
+
+
+### How to add relative path functionality to a Next.js project
 
 In order to add relative path functionality, add the following to the `"compiler options"` in the `tsconfig.json` file:
 
@@ -12,4 +70,43 @@ In order to add relative path functionality, add the following to the `"compiler
 
 The language selector conforms to the regulation of Article 22.2 of the LSSI regarding cookies.
 
-On the `develop-static-site` branch, the same project is executed but as a static page using Javascript Vanilla and deploying it using AWS S3, CloudFront and AWS Lambda. The infrastructure provisioning is automated using CloudFormation.
+## Apache Configuration
+
+You can configure an Apache vhost by enabling the proxy module:
+
+```bash
+sudo a2enmod proxy proxy_http
+```
+
+Then, add a vhost:
+
+```typescript
+<VirtualHost *:80>
+    ServerAdmin web@example.com
+    ServerName example.com
+    ServerAlias www.example.com 
+
+    ProxyRequests off
+
+    <Proxy *>
+        Order deny,allow
+        Allow from all
+    </Proxy>
+
+    <Location />
+        ProxyPass http://localhost:3001/
+        ProxyPassReverse http://localhost:3001/
+    </Location>
+</VirtualHost>
+```
+
+To change your GitHub credentials and verify:
+```bash
+git remote set-url origin https://ghp_J4Npl...@github.com/FernandoFdezdC/guitarras-domingo-fernandez-web.git
+git remote -v
+```
+
+
+### Additional information
+
+On the `develop-static-site` branch, the same project is executed but as a static page using Javascript Vanilla and deploying it using `AWS` `S3`, `CloudFront` and `AWS` `Lambda`. The infrastructure provisioning is automated using `CloudFormation`.
