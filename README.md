@@ -49,7 +49,7 @@ Then, synchronize the static files generated in `/build` folder with `AWS` bucke
 
 The `lambda` folder contains the script executed by the `AWS` Lambda function. `src/index.html` is the entrypoint of the website.
 
-`src/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side).
+`public/error.html` displays an error page when the `S3` bucket fails to load (i.e., when the issue is on `AWS`'s side). In the case of a React app, the error document must be set to `index.html`, since React is a single-page application (SPA) that handles routing client-side, and any unknown path requested directly from the server should still load the same HTML file so that React's router can render the correct view.
 
 `src/locales` folder contains the translations to 2 languages (Spanish and English).
 

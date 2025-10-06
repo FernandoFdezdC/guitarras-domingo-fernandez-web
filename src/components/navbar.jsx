@@ -26,29 +26,51 @@ export default function Navbar() {
     if (initialized.current) return;
     initialized.current = true;
 
-    // Check URL first
+    const pathLang = location.pathname.split("/")[1];
+
+    // Get cookie
+    const cookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("preferred_language="));
+    let cookieLang = null;
+    if (cookie) {
+      const langFromCookie = cookie.split("=")[1];
+      if (langFromCookie === "es" || langFromCookie === "en") cookieLang = langFromCookie;
+    }
+
+    if (pathLang === "es" || pathLang === "en") {
+      // URL has language
+      setCurrentLang(pathLang);
+      document.documentElement.lang = pathLang;
+
+      // Redirect if cookie differs
+      if (cookieLang && cookieLang !== pathLang) {
+        navigate(`/${cookieLang}`, { replace: true });
+      }
+    } else if (cookieLang) {
+      // URL has no language, use cookie
+      setCurrentLang(cookieLang);
+      document.documentElement.lang = cookieLang;
+      navigate(`/${cookieLang}`, { replace: true });
+    } else {
+      // fallback default
+      setCurrentLang("es");
+      document.documentElement.lang = "es";
+      navigate(`/es`, { replace: true });
+    }
+  }, []);
+
+  useEffect(() => {
     const pathLang = location.pathname.split("/")[1];
     if (pathLang === "es" || pathLang === "en") {
       setCurrentLang(pathLang);
       document.documentElement.lang = pathLang;
-    } else {
-      // Fallback to cookie
-      const cookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("preferred_language="));
-      if (cookie) {
-        const langFromCookie = cookie.split("=")[1];
-        if (langFromCookie === "es" || langFromCookie === "en") {
-          setCurrentLang(langFromCookie);
-          document.documentElement.lang = langFromCookie;
-        }
-      }
     }
-  }, []);
+  }, [location.pathname]);
 
   // Handle language change
   const changeLanguage = (lang) => {
-    document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict; Secure`;
+    document.cookie = `preferred_language=${lang}; path=/; max-age=31536000; SameSite=Strict`;
     document.documentElement.lang = lang;
     setCurrentLang(lang);
     const pathParts = location.pathname.split("/");

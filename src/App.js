@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import Home from './pages/Home';
 import Navbar from "./components/navbar";
+import RedirectByCookie from "./components/redirectByCookie";
 import Guitars from './pages/guitars/Guitars';
 import Contact from './pages/contact/Contact';
 import { useLocaleDictionary } from "./lib/useLocaleDictionary";
@@ -38,7 +39,10 @@ function App() {
     <Router>
       <Routes>
         {/* Redirección por idioma */}
-        <Route path="/" element={<Navigate to="/es" replace />} />
+        <Route
+          path="/"
+          element={<RedirectByCookie />}
+        />
 
         {/* Rutas por idioma */}
         <Route
