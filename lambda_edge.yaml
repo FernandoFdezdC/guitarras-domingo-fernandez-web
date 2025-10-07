@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda@Edge function to inject security headers for existing CloudFront distribution. Must be deployed in us-east-1 region (Lambda@Edge requirement)
+
+Resources:
+  LambdaEdgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaEdgeSecurityHeadersRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaEdgeGetFunction
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:GetFunction
+                Resource: arn:aws:lambda:us-east-1:800425446766:function:SecurityHeadersLambdaEdge:*
+
+  SecurityHeadersFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SecurityHeadersLambdaEdge
+      Description: Adds security headers to CloudFront responses
+      Handler: index.handler
+      Role: !GetAtt LambdaEdgeRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          'use strict';
+          exports.handler = async (event) => {
+              const response = event.Records[0].cf.response;
+              const headers = response.headers;
+
+              headers['strict-transport-security'] = [{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }];
+              headers['content-security-policy'] = [{ key: 'Content-Security-Policy', value: "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;" }];
+              headers['x-content-type-options'] = [{ key: 'X-Content-Type-Options', value: 'nosniff' }];
+              headers['x-frame-options'] = [{ key: 'X-Frame-Options', value: 'DENY' }];
+              headers['referrer-policy'] = [{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }];
+              headers['permissions-policy'] = [{ key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' }];
+
+              return response;
+          };
+      MemorySize: 128
+      Timeout: 3
+
+  SecurityHeadersFunctionVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref SecurityHeadersFunction
+
+Outputs:
+  LambdaEdgeFunctionArn:
+    Description: ARN of the Lambda@Edge function version
+    Value: !Ref SecurityHeadersFunctionVersion
