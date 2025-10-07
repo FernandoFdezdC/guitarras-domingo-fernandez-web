@@ -118,7 +118,7 @@ Email error can be produced on the side of the `lambda` or on the side of the `A
 
 `lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with correct parameters.
 
-## Associate lambda function to cloudfront
+## Associate lambda function to CloudFront
 
 After `cloudfront.yaml` and `lambda_edge.yaml` `CloudFormation` templates have been deployed, execute:
 
