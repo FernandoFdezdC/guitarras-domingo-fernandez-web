@@ -117,3 +117,18 @@ Email error can be produced on the side of the `lambda` or on the side of the `A
 ![alt text](image.png)
 
 `lambda/test_curl.sh` contains a test cURL call to test the API Gateway (remember to change the API URL) with correct parameters.
+
+## Associate lambda function to cloudfront
+
+After `cloudfront.yaml` and `lambda_edge.yaml` `CloudFormation` templates have been deployed, execute:
+
+```bash
+chmod +x ./scripts/associate_function_with_cloudfront.sh
+sudo apt update
+sudo apt install jq -y
+./scripts/associate_function_with_cloudfront.sh <CLOUDFRONT_ID> <LAMBDA_EDGE_ARN>:<LAMBDA_EDGE_VERSION>
+```
+
+Lambda edge version can be found here:
+
+![alt text](image-1.png)
