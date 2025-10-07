@@ -9,7 +9,7 @@ export default function Contact() {
   const t = useLocaleDictionary(lang || 'es').contact; // fallback
 
   const emailUrl = "https://1ysqxqs6lb.execute-api.eu-south-2.amazonaws.com/prod/contact";
-  const loggingUrl = "https://uuk2k5e962.execute-api.eu-south-2.amazonaws.com/prod/errorLog";
+  const loggingUrl = "https://9b1jf394ik.execute-api.eu-south-2.amazonaws.com/prod/errorLog";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,7 +38,7 @@ export default function Contact() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: "ERROR - Form submitted with missing fields",
+          message: "Form submitted with missing fields",
           origin: window.location.origin,
           formData,
         }),
