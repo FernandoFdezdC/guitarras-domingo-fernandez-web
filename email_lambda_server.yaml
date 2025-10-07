@@ -160,5 +160,5 @@ Resources:
 
 Outputs:
   ContactApiUrl:
-    Description: URL del endpoint POST /contact
+    Description: URL of POST endpoint /contact
     Value: !Sub "https://${ContactApi}.execute-api.${AWS::Region}.amazonaws.com/prod/contact"

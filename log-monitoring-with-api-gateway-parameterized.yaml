@@ -1,0 +1,459 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Create CloudWatch Log Group, metric filter, SNS topic + email subscription,
+  DynamoDB table for incidents, IAM role with inline policy, LogAlertProcessor Lambda,
+  subscription filter to that Lambda, a Logger lambda that writes to the
+  same log group and that is connected to an API Gateway endpoint, and a CloudWatch dashboard.
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Short name for the project; will be appended to every resource name
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    ConstraintDescription: Alphanumeric and hyphen characters only.
+  NotificationEmail:
+    Type: String
+    Description: Email address to subscribe to LogAlerts SNS topic (you must confirm)
+  LogRetentionDays:
+    Type: Number
+    Default: 7
+    Description: Retention in days for the log group (adjust later if you want)
+  AllowedOrigins:
+    Type: CommaDelimitedList
+    Default: "https://guitarras-domingo-fernandez.es,https://www.guitarras-domingo-fernandez.es,http://guitarras-domingo-fernandez.s3-website.eu-south-2.amazonaws.com"
+    Description: Allowed domains for CORS
+
+Resources:
+
+  ## Log Group
+  DemoLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/log-monitoring-${ProjectName}
+      RetentionInDays: !Ref LogRetentionDays
+
+  ## SNS Topic & Subscription
+  LogAlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub LogAlerts-${ProjectName}
+
+  LogAlertsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref LogAlertsTopic
+      Protocol: email
+      Endpoint: !Ref NotificationEmail
+
+  ## DynamoDB Table
+  LogIncidentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub LogIncidents-${ProjectName}
+      AttributeDefinitions:
+        - AttributeName: service
+          AttributeType: S
+        - AttributeName: ts
+          AttributeType: N
+      KeySchema:
+        - AttributeName: service
+          KeyType: HASH
+        - AttributeName: ts
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  ## IAM Role for LogAlertProcessor (user-specified name + project)
+  LambdaLogProcessorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub LambdaLogProcessorRole-${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: !Sub LambdaLogProcessorRolePolicy-${ProjectName}
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: DDBWriteIncidents
+                Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:DescribeTable
+                Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/LogIncidents-${ProjectName}
+              - Sid: AlertPublish
+                Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:LogAlerts-${ProjectName}
+
+  ## Lambda: LogAlertProcessor
+  LogAlertProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub LogAlertProcessor-${ProjectName}
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaLogProcessorRole.Arn
+      Timeout: 30
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub LogIncidents-${ProjectName}
+          TOPIC_ARN: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:LogAlerts-${ProjectName}
+          LEVEL_REGEX: '(ERROR|Exception|Traceback|Timeout)'
+      Code:
+        ZipFile: |
+          import os, json, base64, gzip, re, time, uuid
+          from io import BytesIO
+          import boto3
+
+          dynamodb = boto3.resource("dynamodb")
+          sns = boto3.client("sns")
+          TABLE = dynamodb.Table(os.environ["TABLE_NAME"])
+          TOPIC_ARN = os.environ["TOPIC_ARN"]
+          LEVEL_RE = re.compile(os.environ.get("LEVEL_REGEX", r"(ERROR|Exception|Traceback|Timeout)"), re.I)
+
+          def _decode(event):
+              # CloudWatch Logs → Lambda subscription payload
+              data = event["awslogs"]["data"]
+              raw = gzip.decompress(base64.b64decode(data))
+              return json.loads(raw)  # {owner, logGroup, logStream, logEvents:[{id,timestamp,message}]}
+
+          def lambda_handler(event, context):
+              decoded = _decode(event)
+              group  = decoded["logGroup"]
+              stream = decoded["logStream"]
+              events = decoded.get("logEvents", [])
+
+              matches = []
+              for e in events:
+                  msg = e.get("message","")
+                  if LEVEL_RE.search(msg):
+                      matches.append({
+                          "service": group,
+                          "ts": int(e["timestamp"]),  # ms
+                          "level": "ERROR",
+                          "stream": stream,
+                          "id": e.get("id", str(uuid.uuid4())),
+                          "message": msg[:2000]  # keep bounded
+                      })
+
+              # Write each match to DDB (simple, reliable, low volume)
+              for m in matches:
+                  TABLE.put_item(Item=m)
+
+              # Batch summary to SNS (no spam if no matches)
+              if matches:
+                  sample = matches[0]["message"].strip().replace("\n"," ")[:180]
+                  summary = {
+                      "service": group,
+                      "count": len(matches),
+                      "example": sample,
+                      "stream": stream,
+                      "firstTs": matches[0]["ts"],
+                      "lastTs": matches[-1]["ts"]
+                  }
+                  sns.publish(
+                      TopicArn=TOPIC_ARN,
+                      Subject=f"[ALERT] {group} matched {len(matches)} error log(s)",
+                      Message=json.dumps(summary, indent=2)
+                  )
+
+              print(json.dumps({"event":"log_batch_done","group":group,"matched":len(matches)}))
+              return {"statusCode": 200, "body": json.dumps({"ok": True, "matched": len(matches)})}
+
+
+  ## Permission for CloudWatch Logs to invoke the Lambda (source restricted to the demo log group)
+  AllowLogsToInvokeLogAlertProcessor:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LogAlertProcessorFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/log-monitoring-${ProjectName}:*
+
+  ## Subscription Filter: LogSubscriptionFilter -> LogAlertProcessor
+  LogSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      FilterName: !Sub LogSubscriptionFilter-${ProjectName}
+      LogGroupName: !Sub /aws/log-monitoring-${ProjectName}
+      FilterPattern: "?ERROR ?Exception ?Traceback ?Timeout"
+      DestinationArn: !GetAtt LogAlertProcessorFunction.Arn
+
+  ## Metric Filter on the log group
+  ErrorMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    DependsOn: DemoLogGroup
+    Properties:
+      FilterName: !Sub Filter-${ProjectName}
+      LogGroupName: !Sub /aws/log-monitoring-${ProjectName}
+      FilterPattern: "?ERROR ?Exception ?Traceback ?Timeout"
+      MetricTransformations:
+        - MetricValue: "1"
+          MetricNamespace: "App/Logs"
+          MetricName: "ErrorCount"
+
+  ## CloudWatch Alarm
+  LogErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub LogErrorsAlarm-${ProjectName}
+      AlarmDescription: "Triggered when App/Logs ErrorCount Sum >= 1 over 1 minute"
+      Namespace: "App/Logs"
+      MetricName: "ErrorCount"
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref LogAlertsTopic
+      OKActions:
+        - !Ref LogAlertsTopic
+      TreatMissingData: notBreaching
+
+  ##
+  ## Lambda that writes to /aws/log-monitoring directly (so that test logs can be generated)
+  ## This lambda uses a separate role with logs:PutLogEvents permissions against the demo group.
+  ##
+  LoggerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub LoggerRole-${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: !Sub LoggerLogsWritePolicy-${ProjectName}
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/log-monitoring-${ProjectName}:*
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/log-monitoring-${ProjectName}:log-stream:*
+
+  LoggerEntrypointFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub LoggerEntrypointFunction-${ProjectName}
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !GetAtt LoggerRole.Arn
+      Timeout: 10
+      Environment:
+        Variables:
+          LOG_GROUP: !Sub /aws/log-monitoring-${ProjectName}
+          ALLOWED_ORIGINS: !Join [ ",", !Ref AllowedOrigins ]
+      Code:
+        ZipFile: |
+          import boto3, os, time, json
+
+          LOG_GROUP = os.environ.get("LOG_GROUP")
+          logs = boto3.client("logs")
+
+          def lambda_handler(event, context):
+              stream_name = f"lambda-stream-{int(time.time() * 1000)}"
+
+              # Ensure log group exists
+              try:
+                  logs.create_log_group(logGroupName=LOG_GROUP)
+              except logs.exceptions.ResourceAlreadyExistsException:
+                  pass
+
+              # Ensure log stream exists
+              try:
+                  logs.create_log_stream(logGroupName=LOG_GROUP, logStreamName=stream_name)
+              except logs.exceptions.ResourceAlreadyExistsException:
+                  pass
+
+              # Get message from API Gateway POST body
+              try:
+                  body = event.get("body")
+                  if body:
+                      if isinstance(body, str):
+                          data = json.loads(body)
+                      else:
+                          data = body
+                      user_message = data.get("message", "No message provided")
+                  else:
+                      user_message = "No message provided"
+              except Exception as e:
+                  user_message = f"Error parsing body: {str(e)}"
+
+              # Prepend "ERROR - " to match previous format
+              formatted_message = f"ERROR - {user_message}"
+
+              events = [{"timestamp": int(time.time() * 1000), "message": formatted_message}]
+
+              logs.put_log_events(
+                  logGroupName=LOG_GROUP,
+                  logStreamName=stream_name,
+                  logEvents=events
+              )
+
+              allowed_origins = os.environ.get("ALLOWED_ORIGINS", "").split(",")
+              origin = event.get("headers", {}).get("origin", "")
+              response_origin = origin if origin in allowed_origins else allowed_origins[0]
+
+              return {
+                  "statusCode": 200,
+                  "headers": {
+                      "Access-Control-Allow-Origin": response_origin,
+                      "Access-Control-Allow-Headers": "Content-Type",
+                      "Access-Control-Allow-Methods": "POST,OPTIONS"
+                  },
+                  "body": json.dumps({"ok": True, "logged_message": formatted_message})
+              }
+
+  ## CloudWatch Dashboard
+  RealTimeLogDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub RealTimeLogDashboard-${ProjectName}
+      DashboardBody: !Sub
+        - |
+          {
+            "widgets": [
+              {
+                "type": "metric",
+                "x": 0,
+                "y": 0,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "metrics": [
+                    [ "App/Logs", "ErrorCount" ]
+                  ],
+                  "period": 60,
+                  "stat": "Sum",
+                  "title": "ErrorCount (1 min)",
+                  "region": "${AWS::Region}",
+                  "accountId": "${AWS::AccountId}"
+                }
+              },
+              {
+                "type": "alarm",
+                "x": 12,
+                "y": 0,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "alarms": ["${LogErrorsAlarmArn}"],
+                  "title": "Alarm status"
+                }
+              },
+              {
+                "type": "log",
+                "x": 0,
+                "y": 6,
+                "width": 24,
+                "height": 6,
+                "properties": {
+                  "queryString": "fields @timestamp, @message, @logStream | filter @message like /ERROR|Exception|Traceback|Timeout/ | sort @timestamp desc | limit 20",
+                  "logGroupNames": [ "${DemoLogGroupName}" ],
+                  "title": "Recent Errors (Logs Insights)"
+                }
+              }
+            ]
+          }
+        - {
+          LogErrorsAlarmArn: !GetAtt LogErrorsAlarm.Arn,
+          DemoLogGroupName: !Ref DemoLogGroup
+        }
+      # provide substitution variables used inside DashboardBody
+      # these map to the actual names we created above
+      # CloudFormation will substitute them into the JSON string
+      # Note: ${ProjectName} is implicitly available; we define these explicit values for clarity
+      # DashboardBody substitution variables are provided by Fn::Sub automatically in this block
+
+  ## API GATEWAY
+  ErrorLogApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ErrorLogApi-${ProjectName}
+
+  ErrorLogResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ErrorLogApi.RootResourceId
+      PathPart: errorLog
+      RestApiId: !Ref ErrorLogApi
+
+  ErrorLogPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ErrorLogApi
+      ResourceId: !Ref ErrorLogResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - arn:aws:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - { Region: !Ref "AWS::Region", LambdaArn: !GetAtt LoggerEntrypointFunction.Arn }
+  
+  ErrorLogApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ErrorLogPostMethod
+    Properties:
+      RestApiId: !Ref ErrorLogApi
+      StageName: prod
+
+  ApiGatewayInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LoggerEntrypointFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ErrorLogApi}/*/POST/errorLog
+
+
+Outputs:
+  LogGroupName:
+    Description: Log group created
+    Value: !Ref DemoLogGroup
+
+  SNSTopicARN:
+    Description: SNS Topic ARN
+    Value: !Ref LogAlertsTopic
+
+  DynamoDBTable:
+    Description: DynamoDB table name
+    Value: !Ref LogIncidentsTable
+
+  LogAlertProcessorFunctionArn:
+    Description: ARN for LogAlertProcessor
+    Value: !GetAtt LogAlertProcessorFunction.Arn
+
+  LoggerEntrypointFunctionArn:
+    Description: ARN for the test logger
+    Value: !GetAtt LoggerEntrypointFunction.Arn
+  
+  LoggerApiUrl:
+    Description: URL of POST endpoint /errorLog
+    Value: !Sub "https://${ErrorLogApi}.execute-api.${AWS::Region}.amazonaws.com/prod/errorLog"
+
+Metadata:
+  DashboardSubstitutions:
+    LogAlarmName: !Sub LogErrorsAlarm-${ProjectName}
+    LogGroupName: !Sub /aws/log-monitoring-${ProjectName}

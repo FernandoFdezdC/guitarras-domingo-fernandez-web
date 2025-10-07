@@ -132,3 +132,12 @@ sudo apt install jq -y
 Lambda edge version can be found here:
 
 ![alt text](image-1.png)
+
+
+### Troubleshooting API Gateway
+
+Execute a POST call like this:
+
+```bash
+curl -X POST https://f6nbx96mh4.execute-api.eu-south-2.amazonaws.com/prod/errorLog -H "Content-Type: application/json" -H "Origin: https://guitarras-domingo-fernandez.es" -d '{"message": "Error sending email"}'
+```

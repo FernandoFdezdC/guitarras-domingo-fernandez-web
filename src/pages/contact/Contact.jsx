@@ -8,6 +8,9 @@ export default function Contact() {
   const { lang } = useParams();
   const t = useLocaleDictionary(lang || 'es').contact; // fallback
 
+  const emailUrl = "https://1ysqxqs6lb.execute-api.eu-south-2.amazonaws.com/prod/contact";
+  const loggingUrl = "https://uuk2k5e962.execute-api.eu-south-2.amazonaws.com/prod/errorLog";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,10 +31,25 @@ export default function Contact() {
     setSuccess(false);
     setError("");
 
-    const lambdaUrl = "https://1ysqxqs6lb.execute-api.eu-south-2.amazonaws.com/prod/contact";
+    console.log("CALL")
+    // Check if any required field is empty
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      await fetch(loggingUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "ERROR - Form submitted with missing fields",
+          origin: window.location.origin,
+          formData,
+        }),
+      });
+      setError(t.errorIncomplete || "Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch(lambdaUrl, {
+      const response = await fetch(emailUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,6 +64,15 @@ export default function Contact() {
         setSuccess(true);
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
+        // Send error log to AWS
+        await fetch(loggingUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: `Error submitting form: ${data.message || "Unknown error"}`,
+            origin: window.location.origin,
+          }),
+        });
         setError(data.message || t.errorMsg);
       }
     } catch (err) {
@@ -73,7 +100,6 @@ export default function Contact() {
             type="text"
             name="name"
             placeholder={t.placeholders.name}
-            required
             value={formData.name}
             onChange={handleChange}
             className="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
@@ -82,7 +108,6 @@ export default function Contact() {
             type="email"
             name="email"
             placeholder={t.placeholders.email}
-            required
             value={formData.email}
             onChange={handleChange}
             className="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
@@ -91,7 +116,6 @@ export default function Contact() {
             type="text"
             name="subject"
             placeholder={t.placeholders.subject}
-            required
             value={formData.subject}
             onChange={handleChange}
             className="w-full p-3 bg-red-900 text-white border border-red-700 rounded focus:outline-none focus:border-black focus:ring-2 focus:ring-red-500 placeholder-[#C18C8D]"
@@ -99,7 +123,6 @@ export default function Contact() {
           <textarea
             name="message"
             placeholder={t.placeholders.message}
-            required
             rows={5}
             value={formData.message}
             onChange={handleChange}
