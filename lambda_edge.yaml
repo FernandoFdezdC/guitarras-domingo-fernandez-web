@@ -1,11 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Lambda@Edge function to inject security headers for existing CloudFront distribution. Must be deployed in us-east-1 region (Lambda@Edge requirement)
 
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Short name for the project; will be appended to every resource name
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    ConstraintDescription: Alphanumeric and hyphen characters only.
+
 Resources:
   LambdaEdgeRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaEdgeSecurityHeadersRole
+      RoleName: !Sub "LambdaEdgeSecurityHeadersRole-${ProjectName}"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -25,12 +32,12 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:GetFunction
-                Resource: arn:aws:lambda:us-east-1:800425446766:function:SecurityHeadersLambdaEdge:*
+                Resource: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:SecurityHeadersLambdaEdge-${ProjectName}:*"
 
   SecurityHeadersFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: SecurityHeadersLambdaEdge
+      FunctionName: !Sub "SecurityHeadersLambdaEdge-${ProjectName}"
       Description: Adds security headers to CloudFront responses
       Handler: index.handler
       Role: !GetAtt LambdaEdgeRole.Arn
@@ -43,7 +50,7 @@ Resources:
               const headers = response.headers;
 
               headers['strict-transport-security'] = [{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }];
-              headers['content-security-policy'] = [{ key: 'Content-Security-Policy', value: "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;" }];
+              headers['content-security-policy'] = [{ key: 'Content-Security-Policy', value: "default-src 'self'; connect-src 'self' https://9b1jf394ik.execute-api.eu-south-2.amazonaws.com https://1ysqxqs6lb.execute-api.eu-south-2.amazonaws.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;" }];
               headers['x-content-type-options'] = [{ key: 'X-Content-Type-Options', value: 'nosniff' }];
               headers['x-frame-options'] = [{ key: 'X-Frame-Options', value: 'DENY' }];
               headers['referrer-policy'] = [{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }];

@@ -76,10 +76,19 @@ export default function Contact() {
         setError(data.message || t.errorMsg);
       }
     } catch (err) {
+      // Send error log to AWS
+      await fetch(loggingUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: `Error submitting form: ${err.message || "Unknown error"}`,
+          origin: window.location.origin,
+        }),
+      });
       setError(err.message || "Connection error. Try it again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
